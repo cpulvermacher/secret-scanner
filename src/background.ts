@@ -40,6 +40,9 @@ chrome.runtime.onMessage.addListener(
 
 async function startScanning(tabId: number): Promise<void> {
   try {
+    // Clear any existing badge
+    updateBadge(tabId, 0);
+
     // Attach debugger to the tab
     await chrome.debugger.attach({ tabId }, "1.3");
 
@@ -159,16 +162,34 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
       });
     }
   });
+
+  // Update badge if new secrets were found
+  if (tabData.results.length > previousCount) {
+    updateBadge(tabId, tabData.results.length);
+  }
 }
 
 async function stopScanning(tabId: number): Promise<void> {
   try {
     await chrome.debugger.detach({ tabId });
+    const tabData = activeTabs.get(tabId);
+    if (tabData && tabData.results.length === 0) {
+      // Clear badge if no secrets were found
+      chrome.action.setBadgeText({ text: "", tabId });
+    }
     activeTabs.delete(tabId);
     console.log(`Stopped scanning tab ${tabId}`);
   } catch (error) {
     console.error("Failed to stop scanning:", error);
   }
+}
+
+function updateBadge(tabId: number, count: number): void {
+  const badgeText = count > 0 ? count.toString() : "";
+  const badgeColor = count > 0 ? "#FF4444" : "#4CAF50";
+
+  chrome.action.setBadgeText({ text: badgeText, tabId });
+  chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
 }
 
 // Clean up when tab is closed
