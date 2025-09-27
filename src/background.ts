@@ -130,12 +130,19 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
         const matches = content.match(pattern);
         if (matches) {
             matches.forEach((match: string) => {
-                tabData.results.push({
-                    pattern: pattern.source,
-                    match: match,
-                    source: source,
-                    timestamp: new Date().toISOString(),
-                });
+                const isDuplicate = tabData.results.some(
+                    (existing) =>
+                        existing.match === match && existing.source === source,
+                );
+
+                if (!isDuplicate) {
+                    tabData.results.push({
+                        pattern: pattern.source,
+                        match: match,
+                        source: source,
+                        timestamp: new Date().toISOString(),
+                    });
+                }
             });
         }
     });
