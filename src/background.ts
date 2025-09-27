@@ -52,39 +52,37 @@ async function startScanning(tabId: number): Promise<void> {
       results: [],
     });
 
+    // Enable Debugger domain to catch script parsing
+    await chrome.debugger.sendCommand({ tabId }, "Debugger.enable");
+
     // Enable Runtime domain to catch script parsing
     await chrome.debugger.sendCommand({ tabId }, "Runtime.enable");
 
     // Enable Network domain to intercept responses
     await chrome.debugger.sendCommand({ tabId }, "Network.enable");
-
-    console.log(`Started scanning tab ${tabId}`);
-
-    // Set up event listeners for this tab
-    setupEventListeners(tabId);
   } catch (error) {
     console.error("Failed to start scanning:", error);
   }
 }
 
-function setupEventListeners(tabId: number): void {
-  // Listen for script parsed events
-  chrome.debugger.onEvent.addListener(
-    (source: chrome.debugger.Debuggee, method: string, params?: any) => {
-      if (source.tabId === tabId && method === "Debugger.scriptParsed") {
-        handleScriptParsed(tabId, params);
-      }
-    },
-  );
+// Global event listener (only set up once)
+if (!chrome.debugger.onEvent.hasListener(handleDebuggerEvent)) {
+  chrome.debugger.onEvent.addListener(handleDebuggerEvent);
+}
 
-  // Listen for network response events
-  chrome.debugger.onEvent.addListener(
-    (source: chrome.debugger.Debuggee, method: string, params?: any) => {
-      if (source.tabId === tabId && method === "Network.responseReceived") {
-        handleNetworkResponse(tabId, params);
-      }
-    },
-  );
+function handleDebuggerEvent(
+  source: chrome.debugger.Debuggee,
+  method: string,
+  params?: object,
+): void {
+  const tabId = source.tabId;
+  if (!tabId || !activeTabs.has(tabId)) return;
+
+  if (method === "Debugger.scriptParsed") {
+    handleScriptParsed(tabId, params);
+  } else if (method === "Network.responseReceived") {
+    handleNetworkResponse(tabId, params);
+  }
 }
 
 async function handleScriptParsed(tabId: number, params: any): Promise<void> {
@@ -138,6 +136,8 @@ async function handleNetworkResponse(
 function scanForSecrets(tabId: number, content: string, source: string): void {
   const tabData = activeTabs.get(tabId);
   if (!tabData) return;
+
+  const previousCount = tabData.results.length;
 
   // Simple secret patterns - can be extended
   const secretPatterns: RegExp[] = [
