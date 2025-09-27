@@ -11,7 +11,7 @@ interface SecretResult {
     timestamp: string;
 }
 
-let activeTabs = new Map<number, TabData>(); // Track active scanning sessions
+const activeTabs = new Map<number, TabData>(); // Track active scanning sessions
 
 interface Message {
     action: string;
@@ -22,8 +22,8 @@ interface Message {
 chrome.runtime.onMessage.addListener(
     (
         message: Message,
-        sender: chrome.runtime.MessageSender,
-        sendResponse: (response?: any) => void,
+        _sender: chrome.runtime.MessageSender,
+        sendResponse: (response?: object) => void,
     ) => {
         if (message.action === "startScanning") {
             startScanning(message.tabId);
@@ -79,13 +79,20 @@ function handleDebuggerEvent(
     if (!tabId || !activeTabs.has(tabId)) return;
 
     if (method === "Debugger.scriptParsed") {
-        handleScriptParsed(tabId, params);
+        handleScriptParsed(tabId, params as ScriptParsedParams);
     } else if (method === "Network.responseReceived") {
-        handleNetworkResponse(tabId, params);
+        handleNetworkResponse(tabId, params as NetworkResponseParams);
     }
 }
 
-async function handleScriptParsed(tabId: number, params: any): Promise<void> {
+interface ScriptParsedParams {
+    url?: string;
+    scriptId: string;
+}
+async function handleScriptParsed(
+    tabId: number,
+    params?: ScriptParsedParams,
+): Promise<void> {
     const tabData = activeTabs.get(tabId);
     if (!tabData || !tabData.scanning) return;
 
@@ -94,14 +101,14 @@ async function handleScriptParsed(tabId: number, params: any): Promise<void> {
         const result = (await chrome.debugger.sendCommand(
             { tabId },
             "Debugger.getScriptSource",
-            { scriptId: params.scriptId },
+            { scriptId: params?.scriptId },
         )) as { scriptSource?: string };
 
-        if (result && result.scriptSource) {
+        if (result?.scriptSource) {
             scanForSecrets(
                 tabId,
                 result.scriptSource,
-                params.url || "inline script",
+                params?.url || "inline script",
             );
         }
     } catch (error) {
@@ -109,26 +116,33 @@ async function handleScriptParsed(tabId: number, params: any): Promise<void> {
     }
 }
 
+interface NetworkResponseParams {
+    response: {
+        mimeType: string;
+        url: string;
+    };
+    requestId: string;
+}
 async function handleNetworkResponse(
     tabId: number,
-    params: any,
+    params?: NetworkResponseParams,
 ): Promise<void> {
     const tabData = activeTabs.get(tabId);
     if (!tabData || !tabData.scanning) return;
 
-    const response = params.response;
+    const response = params?.response;
 
     // Only process JavaScript files
-    if (response.mimeType && response.mimeType.includes("javascript")) {
+    if (response?.mimeType?.includes("javascript")) {
         try {
             // Get response body
             const result = (await chrome.debugger.sendCommand(
                 { tabId },
                 "Network.getResponseBody",
-                { requestId: params.requestId },
+                { requestId: params?.requestId },
             )) as { body?: string };
 
-            if (result && result.body) {
+            if (result?.body) {
                 scanForSecrets(tabId, result.body, response.url);
             }
         } catch (error) {

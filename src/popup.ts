@@ -5,7 +5,7 @@ let isScanning: boolean = false;
 chrome.tabs.query(
     { active: true, currentWindow: true },
     (tabs: chrome.tabs.Tab[]) => {
-        if (tabs[0] && tabs[0].id) {
+        if (tabs[0]?.id) {
             currentTabId = tabs[0].id;
             updateUI();
             loadResults();
@@ -25,19 +25,22 @@ const resultsList = document.getElementById("resultsList") as HTMLElement;
 
 // Toggle scanning
 toggleButton.addEventListener("click", (): void => {
+    if (currentTabId === null) {
+        return;
+    }
     if (isScanning) {
-        stopScanning();
+        stopScanning(currentTabId);
     } else {
-        startScanning();
+        startScanning(currentTabId);
     }
 });
 
-function startScanning(): void {
+function startScanning(tabId: number): void {
     // Start scanning first, then reload to catch all network requests
     chrome.runtime.sendMessage(
         {
             action: "startScanning",
-            tabId: currentTabId,
+            tabId,
         },
         (response: { status: string }) => {
             if (response.status === "started") {
@@ -47,17 +50,17 @@ function startScanning(): void {
                 // Poll for results every 2 seconds
                 pollForResults();
 
-                chrome.tabs.reload(currentTabId!);
+                chrome.tabs.reload(tabId);
             }
         },
     );
 }
 
-function stopScanning(): void {
+function stopScanning(tabId: number): void {
     chrome.runtime.sendMessage(
         {
             action: "stopScanning",
-            tabId: currentTabId,
+            tabId,
         },
         (response: { status: string }) => {
             if (response.status === "stopped") {
@@ -83,7 +86,7 @@ function loadResults(): void {
             tabId: currentTabId,
         },
         (response: { results?: SecretResult[] }) => {
-            if (response && response.results) {
+            if (response?.results) {
                 displayResults(response.results);
             }
         },

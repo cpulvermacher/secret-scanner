@@ -7,10 +7,11 @@
         "build": "sh ./util/build.sh production",
         "dev": "sh ./util/build.sh dev",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "lint": "tsc &&"
+        "lint": "tsc && biome lint src/"
     },
     "packageManager": "pnpm@10.12.4",
     "devDependencies": {
+        "@biomejs/biome": "2.2.4",
         "@types/chrome": "^0.1.12",
         "typescript": "^5.9.2",
         "vite": "^7.1.7"
