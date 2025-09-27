@@ -33,6 +33,7 @@ toggleButton.addEventListener("click", (): void => {
 });
 
 function startScanning(): void {
+  // Start scanning first, then reload to catch all network requests
   chrome.runtime.sendMessage(
     {
       action: "startScanning",
@@ -45,6 +46,8 @@ function startScanning(): void {
 
         // Poll for results every 2 seconds
         pollForResults();
+
+        chrome.tabs.reload(currentTabId!);
       }
     },
   );
@@ -97,12 +100,12 @@ function pollForResults(): void {
 function updateUI(): void {
   if (isScanning) {
     statusIndicator.className = "status-indicator active";
-    statusText.textContent = "Scanning active";
+    statusText.textContent = "Scanning page for secrets...";
     toggleButton.textContent = "Stop Scanning";
   } else {
     statusIndicator.className = "status-indicator inactive";
-    statusText.textContent = "Not scanning";
-    toggleButton.textContent = "Start Scanning";
+    statusText.textContent = "Ready to scan";
+    toggleButton.textContent = "Reload & Scan Page";
   }
 }
 
@@ -130,5 +133,3 @@ function escapeHtml(text: string): string {
   div.textContent = text;
   return div.innerHTML;
 }
-
-// export {};
