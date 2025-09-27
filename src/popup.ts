@@ -119,7 +119,7 @@ function displayResults(results: SecretResult[]): void {
     .map(
       (result: SecretResult) => `
     <div class="result-item">
-      <div class="result-type">🚨 Secret Detected</div>
+      <div class="result-type">Secret Detected</div>
       <div class="result-match">${escapeHtml(result.match.substring(0, 100))}${result.match.length > 100 ? "..." : ""}</div>
       <div class="result-source">Source: ${escapeHtml(result.source)}</div>
     </div>
