@@ -4,7 +4,6 @@ interface TabData {
 }
 
 export interface SecretResult {
-    type: string;
     pattern: string;
     match: string; // the found secret
     source: string; // source URL
@@ -132,7 +131,6 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
         if (matches) {
             matches.forEach((match: string) => {
                 tabData.results.push({
-                    type: "secret_found",
                     pattern: pattern.source,
                     match: match,
                     source: source,
