@@ -146,6 +146,7 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
     /-----BEGIN EC PRIVATE KEY-----/g,
     /sk_live_[a-zA-Z0-9]{24}/g, // Stripe secret key
     /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g, // Slack bot token
+    /api[_-]?key\s*[:=]\s*['"][^'"]+['"]/gi,
   ];
 
   secretPatterns.forEach((pattern: RegExp) => {
