@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Secret Scanner",
+  "description": "Scans JavaScript files for embedded secrets using chrome.debugger API",
+  "version": "__VERSION__",
+  "version_name": "__VERSION_NAME__",
+  "minimum_chrome_version": "140",
+  "permissions": ["debugger", "activeTab", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Secret Scanner"
+  },
+  "host_permissions": ["<all_urls>"]
+}
+
