@@ -9,7 +9,7 @@ chrome.tabs.query(
     (tabs: chrome.tabs.Tab[]) => {
         if (tabs[0]?.id) {
             currentTabId = tabs[0].id;
-            updateUI();
+            checkScanningStatus();
             loadResults();
         }
     },
@@ -73,6 +73,21 @@ function stopScanning(tabId: number): void {
     );
 }
 
+function checkScanningStatus(): void {
+    if (currentTabId === null) return;
+
+    chrome.runtime.sendMessage(
+        {
+            action: "getStatus",
+            tabId: currentTabId,
+        },
+        (response: { isScanning?: boolean }) => {
+            isScanning = response?.isScanning || false;
+            updateUI();
+        },
+    );
+}
+
 function loadResults(): void {
     chrome.runtime.sendMessage(
         {
@@ -90,7 +105,7 @@ function loadResults(): void {
 function pollForResults(): void {
     if (isScanning) {
         loadResults();
-        setTimeout(pollForResults, 2000);
+        setTimeout(pollForResults, 1000);
     }
 }
 

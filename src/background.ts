@@ -25,42 +25,52 @@ chrome.runtime.onMessage.addListener(
         sendResponse: (response?: object) => void,
     ) => {
         if (message.action === "startScanning") {
-            startScanning(message.tabId).then(() => {
-                sendResponse({ status: "started" });
-            });
+            startScanning(message.tabId)
+                .then(() => {
+                    sendResponse({ status: "started" });
+                })
+                .catch((error: Error) => {
+                    sendResponse({ status: "error", error });
+                });
+            return true; // Keep message channel open for async response
         } else if (message.action === "stopScanning") {
-            stopScanning(message.tabId).then(() => {
-                sendResponse({ status: "stopped" });
-            });
+            stopScanning(message.tabId)
+                .then(() => {
+                    sendResponse({ status: "stopped" });
+                })
+                .catch((error: Error) => {
+                    sendResponse({ status: "error", error });
+                });
+            return true; // Keep message channel open for async response
         } else if (message.action === "getResults") {
             const results = activeTabs.get(message.tabId)?.results || [];
             sendResponse({ results });
+        } else if (message.action === "getStatus") {
+            const tabData = activeTabs.get(message.tabId);
+            const isScanning = tabData?.scanning || false;
+            sendResponse({ isScanning });
         }
     },
 );
 
 async function startScanning(tabId: number): Promise<void> {
-    try {
-        // Clear any existing badge
-        updateBadge(tabId, 0);
+    // Clear any existing badge
+    updateBadge(tabId, 0);
 
-        // Attach debugger to the tab
-        await chrome.debugger.attach({ tabId }, "1.3");
+    // Attach debugger to the tab
+    await chrome.debugger.attach({ tabId }, "1.3");
 
-        // Initialize tab tracking
-        activeTabs.set(tabId, {
-            scanning: true,
-            results: [],
-        });
+    // Initialize tab tracking
+    activeTabs.set(tabId, {
+        scanning: true,
+        results: [],
+    });
 
-        // Enable Debugger domain to catch script parsing
-        await chrome.debugger.sendCommand({ tabId }, "Debugger.enable");
+    // Enable Debugger domain to catch script parsing
+    await chrome.debugger.sendCommand({ tabId }, "Debugger.enable");
 
-        // Enable Runtime domain to catch script parsing
-        await chrome.debugger.sendCommand({ tabId }, "Runtime.enable");
-    } catch (error) {
-        console.error("Failed to start scanning:", error);
-    }
+    // Enable Runtime domain to catch script parsing
+    await chrome.debugger.sendCommand({ tabId }, "Runtime.enable");
 }
 
 // Global event listener (only set up once)
@@ -162,12 +172,8 @@ async function stopScanning(tabId: number): Promise<void> {
         chrome.action.setBadgeText({ text: "", tabId });
     }
     activeTabs.delete(tabId);
-    try {
-        await chrome.debugger.detach({ tabId });
-        console.log(`Stopped scanning tab ${tabId}`);
-    } catch (error) {
-        console.error("Failed to stop scanning:", error);
-    }
+
+    await chrome.debugger.detach({ tabId });
 }
 
 function updateBadge(tabId: number, count: number): void {
