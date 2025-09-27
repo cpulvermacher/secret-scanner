@@ -1,3 +1,5 @@
+import type { SecretResult } from "./background";
+
 let currentTabId: number | null = null;
 let isScanning: boolean = false;
 
@@ -69,14 +71,6 @@ function stopScanning(tabId: number): void {
             }
         },
     );
-}
-
-interface SecretResult {
-    type: string;
-    pattern: string;
-    match: string;
-    source: string;
-    timestamp: string;
 }
 
 function loadResults(): void {

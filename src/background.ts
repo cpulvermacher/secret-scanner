@@ -3,11 +3,11 @@ interface TabData {
     results: SecretResult[];
 }
 
-interface SecretResult {
+export interface SecretResult {
     type: string;
     pattern: string;
-    match: string;
-    source: string;
+    match: string; // the found secret
+    source: string; // source URL
     timestamp: string;
 }
 
@@ -57,9 +57,6 @@ async function startScanning(tabId: number): Promise<void> {
 
         // Enable Runtime domain to catch script parsing
         await chrome.debugger.sendCommand({ tabId }, "Runtime.enable");
-
-        // Enable Network domain to intercept responses
-        await chrome.debugger.sendCommand({ tabId }, "Network.enable");
     } catch (error) {
         console.error("Failed to start scanning:", error);
     }
@@ -80,8 +77,6 @@ function handleDebuggerEvent(
 
     if (method === "Debugger.scriptParsed") {
         handleScriptParsed(tabId, params as ScriptParsedParams);
-    } else if (method === "Network.responseReceived") {
-        handleNetworkResponse(tabId, params as NetworkResponseParams);
     }
 }
 
@@ -113,41 +108,6 @@ async function handleScriptParsed(
         }
     } catch (error) {
         console.error("Failed to get script source:", error);
-    }
-}
-
-interface NetworkResponseParams {
-    response: {
-        mimeType: string;
-        url: string;
-    };
-    requestId: string;
-}
-async function handleNetworkResponse(
-    tabId: number,
-    params?: NetworkResponseParams,
-): Promise<void> {
-    const tabData = activeTabs.get(tabId);
-    if (!tabData || !tabData.scanning) return;
-
-    const response = params?.response;
-
-    // Only process JavaScript files
-    if (response?.mimeType?.includes("javascript")) {
-        try {
-            // Get response body
-            const result = (await chrome.debugger.sendCommand(
-                { tabId },
-                "Network.getResponseBody",
-                { requestId: params?.requestId },
-            )) as { body?: string };
-
-            if (result?.body) {
-                scanForSecrets(tabId, result.body, response.url);
-            }
-        } catch (error) {
-            console.error("Failed to get response body:", error);
-        }
     }
 }
 
@@ -217,5 +177,3 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
         stopScanning(tabId);
     }
 });
-
-export {};
