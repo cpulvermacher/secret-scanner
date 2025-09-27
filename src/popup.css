@@ -81,6 +81,16 @@ button:disabled {
     word-break: break-all;
 }
 
+.source-link {
+    color: #3b82f6;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.source-link:hover {
+    color: #2563eb;
+}
+
 .result-match {
     font-family: monospace;
     font-size: 12px;

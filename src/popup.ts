@@ -134,15 +134,44 @@ function displayResults(results: SecretResult[]): void {
     <div class="result-item">
       <div class="result-type">Secret Detected</div>
       <div class="result-match">${escapeHtml(result.match.substring(0, 100))}${result.match.length > 100 ? "..." : ""}</div>
-      <div class="result-source">Source: ${escapeHtml(result.source)}</div>
+      <div class="result-source">Source: ${formatSourceLink(result.source)}</div>
     </div>
   `,
         )
         .join("");
+
+    // Add click listeners to source links
+    const sourceLinks = resultsList.querySelectorAll('.source-link');
+    sourceLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = (e.target as HTMLElement).dataset.url;
+            if (url && isValidUrl(url)) {
+                chrome.tabs.create({ url });
+            }
+        });
+    });
 }
 
 function escapeHtml(text: string): string {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+}
+
+function isValidUrl(string: string): boolean {
+    try {
+        new URL(string);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function formatSourceLink(source: string): string {
+    if (isValidUrl(source)) {
+        const viewSourceUrl = `view-source:${source}`;
+        return `<a href="#" class="source-link" data-url="${escapeHtml(viewSourceUrl)}">${escapeHtml(source)}</a>`;
+    }
+    return escapeHtml(source);
 }
