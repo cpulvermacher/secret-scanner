@@ -176,17 +176,31 @@ async function stopScanning(tabId: number): Promise<void> {
     await chrome.debugger.detach({ tabId });
 }
 
-function updateBadge(tabId: number, count: number): void {
-    const badgeText = count > 0 ? count.toString() : "";
-    const badgeColor = count > 0 ? "#FF4444" : "#4CAF50";
+function updateBadge(tabId: number, count: number | undefined): void {
+    const badgeText = count !== undefined ? count.toString() : "";
+    const badgeColor = count ? "#FF4444" : "#4CAF50";
 
     chrome.action.setBadgeText({ text: badgeText, tabId });
     chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
 }
 
+chrome.tabs.onActivated.addListener((activeInfo) => {
+    const count = activeTabs.get(activeInfo.tabId)?.results.length;
+    void updateBadge(activeInfo.tabId, count);
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.url === undefined) {
+        return; // url unchanged, nothing to do
+    }
+
+    const count = activeTabs.get(tabId)?.results.length;
+    void updateBadge(tabId, count);
+});
+
 // Clean up when tab is closed
 chrome.tabs.onRemoved.addListener((tabId: number) => {
     if (activeTabs.has(tabId)) {
-        stopScanning(tabId);
+        void stopScanning(tabId);
     }
 });
