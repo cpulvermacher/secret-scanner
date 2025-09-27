@@ -1,0 +1,56 @@
+name: Release
+permissions:
+    contents: write
+
+on:
+    push:
+        tags:
+            - v*.*.*
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  fetch-tags: true
+            - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4
+              with:
+                  version: 10
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "22.x"
+                  cache: "pnpm"
+            - run: pnpm i
+            - run: pnpm test
+            - run: pnpm lint
+            - run: pnpm audit --production
+            - run: pnpm build
+            - name: Create Chrome artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: time-travel-${{ github.ref_name }}-chrome
+                  path: dist/chrome
+            # - name: Upload to Chrome Web Store
+            #   env:
+            #     CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+            #     CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+            #     REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+            #     EXTENSION_ID: jfdbpgcmmenmelcghpbbkldkcfiejcjg
+            #   run: cd dist/chrome && npx chrome-webstore-upload upload
+            # - name: Upload to AMO
+            #   env:
+            #     WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+            #     WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+            #   run: cd dist/firefox && npx web-ext sign --channel listed --upload-source-code ../../time-travel-*-src.zip
+            # - name: Create Firefox artifact
+            #   uses: actions/upload-artifact@v4
+            #   with:
+            #       name: time-travel-${{ github.ref_name }}-firefox
+            #       path: dist/firefox/web-ext-artifacts
+            - name: Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: >-
+                  bash .github/workflows/release.sh ${{ github.ref_name }}
