@@ -25,11 +25,13 @@ chrome.runtime.onMessage.addListener(
         sendResponse: (response?: object) => void,
     ) => {
         if (message.action === "startScanning") {
-            startScanning(message.tabId);
-            sendResponse({ status: "started" });
+            startScanning(message.tabId).then(() => {
+                sendResponse({ status: "started" });
+            });
         } else if (message.action === "stopScanning") {
-            stopScanning(message.tabId);
-            sendResponse({ status: "stopped" });
+            stopScanning(message.tabId).then(() => {
+                sendResponse({ status: "stopped" });
+            });
         } else if (message.action === "getResults") {
             const results = activeTabs.get(message.tabId)?.results || [];
             sendResponse({ results });
@@ -154,14 +156,14 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
 }
 
 async function stopScanning(tabId: number): Promise<void> {
+    const tabData = activeTabs.get(tabId);
+    if (tabData && tabData.results.length === 0) {
+        // Clear badge if no secrets were found
+        chrome.action.setBadgeText({ text: "", tabId });
+    }
+    activeTabs.delete(tabId);
     try {
         await chrome.debugger.detach({ tabId });
-        const tabData = activeTabs.get(tabId);
-        if (tabData && tabData.results.length === 0) {
-            // Clear badge if no secrets were found
-            chrome.action.setBadgeText({ text: "", tabId });
-        }
-        activeTabs.delete(tabId);
         console.log(`Stopped scanning tab ${tabId}`);
     } catch (error) {
         console.error("Failed to stop scanning:", error);
