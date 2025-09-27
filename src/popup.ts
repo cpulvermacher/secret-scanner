@@ -2,22 +2,29 @@ let currentTabId: number | null = null;
 let isScanning: boolean = false;
 
 // Get current tab and initialize UI
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
-  if (tabs[0] && tabs[0].id) {
-    currentTabId = tabs[0].id;
-    updateUI();
-    loadResults();
-  }
-});
+chrome.tabs.query(
+  { active: true, currentWindow: true },
+  (tabs: chrome.tabs.Tab[]) => {
+    if (tabs[0] && tabs[0].id) {
+      currentTabId = tabs[0].id;
+      updateUI();
+      loadResults();
+    }
+  },
+);
 
 // UI elements
-const statusIndicator = document.getElementById('statusIndicator') as HTMLElement;
-const statusText = document.getElementById('statusText') as HTMLElement;
-const toggleButton = document.getElementById('toggleButton') as HTMLButtonElement;
-const resultsList = document.getElementById('resultsList') as HTMLElement;
+const statusIndicator = document.getElementById(
+  "statusIndicator",
+) as HTMLElement;
+const statusText = document.getElementById("statusText") as HTMLElement;
+const toggleButton = document.getElementById(
+  "toggleButton",
+) as HTMLButtonElement;
+const resultsList = document.getElementById("resultsList") as HTMLElement;
 
 // Toggle scanning
-toggleButton.addEventListener('click', (): void => {
+toggleButton.addEventListener("click", (): void => {
   if (isScanning) {
     stopScanning();
   } else {
@@ -26,30 +33,36 @@ toggleButton.addEventListener('click', (): void => {
 });
 
 function startScanning(): void {
-  chrome.runtime.sendMessage({
-    action: 'startScanning',
-    tabId: currentTabId
-  }, (response: { status: string }) => {
-    if (response.status === 'started') {
-      isScanning = true;
-      updateUI();
+  chrome.runtime.sendMessage(
+    {
+      action: "startScanning",
+      tabId: currentTabId,
+    },
+    (response: { status: string }) => {
+      if (response.status === "started") {
+        isScanning = true;
+        updateUI();
 
-      // Poll for results every 2 seconds
-      pollForResults();
-    }
-  });
+        // Poll for results every 2 seconds
+        pollForResults();
+      }
+    },
+  );
 }
 
 function stopScanning(): void {
-  chrome.runtime.sendMessage({
-    action: 'stopScanning',
-    tabId: currentTabId
-  }, (response: { status: string }) => {
-    if (response.status === 'stopped') {
-      isScanning = false;
-      updateUI();
-    }
-  });
+  chrome.runtime.sendMessage(
+    {
+      action: "stopScanning",
+      tabId: currentTabId,
+    },
+    (response: { status: string }) => {
+      if (response.status === "stopped") {
+        isScanning = false;
+        updateUI();
+      }
+    },
+  );
 }
 
 interface SecretResult {
@@ -61,14 +74,17 @@ interface SecretResult {
 }
 
 function loadResults(): void {
-  chrome.runtime.sendMessage({
-    action: 'getResults',
-    tabId: currentTabId
-  }, (response: { results?: SecretResult[] }) => {
-    if (response && response.results) {
-      displayResults(response.results);
-    }
-  });
+  chrome.runtime.sendMessage(
+    {
+      action: "getResults",
+      tabId: currentTabId,
+    },
+    (response: { results?: SecretResult[] }) => {
+      if (response && response.results) {
+        displayResults(response.results);
+      }
+    },
+  );
 }
 
 function pollForResults(): void {
@@ -80,13 +96,13 @@ function pollForResults(): void {
 
 function updateUI(): void {
   if (isScanning) {
-    statusIndicator.className = 'status-indicator active';
-    statusText.textContent = 'Scanning active';
-    toggleButton.textContent = 'Stop Scanning';
+    statusIndicator.className = "status-indicator active";
+    statusText.textContent = "Scanning active";
+    toggleButton.textContent = "Stop Scanning";
   } else {
-    statusIndicator.className = 'status-indicator inactive';
-    statusText.textContent = 'Not scanning';
-    toggleButton.textContent = 'Start Scanning';
+    statusIndicator.className = "status-indicator inactive";
+    statusText.textContent = "Not scanning";
+    toggleButton.textContent = "Start Scanning";
   }
 }
 
@@ -96,17 +112,23 @@ function displayResults(results: SecretResult[]): void {
     return;
   }
 
-  resultsList.innerHTML = results.map((result: SecretResult) => `
+  resultsList.innerHTML = results
+    .map(
+      (result: SecretResult) => `
     <div class="result-item">
       <div class="result-type">🚨 Secret Detected</div>
-      <div class="result-match">${escapeHtml(result.match.substring(0, 100))}${result.match.length > 100 ? '...' : ''}</div>
+      <div class="result-match">${escapeHtml(result.match.substring(0, 100))}${result.match.length > 100 ? "..." : ""}</div>
       <div class="result-source">Source: ${escapeHtml(result.source)}</div>
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 }
 
 function escapeHtml(text: string): string {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }
+
+// export {};

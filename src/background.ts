@@ -19,18 +19,24 @@ interface Message {
 }
 
 // Message handling from popup
-chrome.runtime.onMessage.addListener((message: Message, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
-  if (message.action === "startScanning") {
-    startScanning(message.tabId);
-    sendResponse({ status: "started" });
-  } else if (message.action === "stopScanning") {
-    stopScanning(message.tabId);
-    sendResponse({ status: "stopped" });
-  } else if (message.action === "getResults") {
-    const results = activeTabs.get(message.tabId)?.results || [];
-    sendResponse({ results });
-  }
-});
+chrome.runtime.onMessage.addListener(
+  (
+    message: Message,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response?: any) => void,
+  ) => {
+    if (message.action === "startScanning") {
+      startScanning(message.tabId);
+      sendResponse({ status: "started" });
+    } else if (message.action === "stopScanning") {
+      stopScanning(message.tabId);
+      sendResponse({ status: "stopped" });
+    } else if (message.action === "getResults") {
+      const results = activeTabs.get(message.tabId)?.results || [];
+      sendResponse({ results });
+    }
+  },
+);
 
 async function startScanning(tabId: number): Promise<void> {
   try {
@@ -60,18 +66,22 @@ async function startScanning(tabId: number): Promise<void> {
 
 function setupEventListeners(tabId: number): void {
   // Listen for script parsed events
-  chrome.debugger.onEvent.addListener((source: chrome.debugger.Debuggee, method: string, params?: any) => {
-    if (source.tabId === tabId && method === "Debugger.scriptParsed") {
-      handleScriptParsed(tabId, params);
-    }
-  });
+  chrome.debugger.onEvent.addListener(
+    (source: chrome.debugger.Debuggee, method: string, params?: any) => {
+      if (source.tabId === tabId && method === "Debugger.scriptParsed") {
+        handleScriptParsed(tabId, params);
+      }
+    },
+  );
 
   // Listen for network response events
-  chrome.debugger.onEvent.addListener((source: chrome.debugger.Debuggee, method: string, params?: any) => {
-    if (source.tabId === tabId && method === "Network.responseReceived") {
-      handleNetworkResponse(tabId, params);
-    }
-  });
+  chrome.debugger.onEvent.addListener(
+    (source: chrome.debugger.Debuggee, method: string, params?: any) => {
+      if (source.tabId === tabId && method === "Network.responseReceived") {
+        handleNetworkResponse(tabId, params);
+      }
+    },
+  );
 }
 
 async function handleScriptParsed(tabId: number, params: any): Promise<void> {
@@ -80,13 +90,13 @@ async function handleScriptParsed(tabId: number, params: any): Promise<void> {
 
   try {
     // Get the script source
-    const result = await chrome.debugger.sendCommand(
+    const result = (await chrome.debugger.sendCommand(
       { tabId },
       "Debugger.getScriptSource",
       { scriptId: params.scriptId },
-    );
+    )) as { scriptSource?: string };
 
-    if (result.scriptSource) {
+    if (result && result.scriptSource) {
       scanForSecrets(tabId, result.scriptSource, params.url || "inline script");
     }
   } catch (error) {
@@ -94,7 +104,10 @@ async function handleScriptParsed(tabId: number, params: any): Promise<void> {
   }
 }
 
-async function handleNetworkResponse(tabId: number, params: any): Promise<void> {
+async function handleNetworkResponse(
+  tabId: number,
+  params: any,
+): Promise<void> {
   const tabData = activeTabs.get(tabId);
   if (!tabData || !tabData.scanning) return;
 
@@ -104,13 +117,13 @@ async function handleNetworkResponse(tabId: number, params: any): Promise<void> 
   if (response.mimeType && response.mimeType.includes("javascript")) {
     try {
       // Get response body
-      const result = await chrome.debugger.sendCommand(
+      const result = (await chrome.debugger.sendCommand(
         { tabId },
         "Network.getResponseBody",
         { requestId: params.requestId },
-      );
+      )) as { body?: string };
 
-      if (result.body) {
+      if (result && result.body) {
         scanForSecrets(tabId, result.body, response.url);
       }
     } catch (error) {
@@ -165,3 +178,4 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
   }
 });
 
+export {};
