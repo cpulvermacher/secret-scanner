@@ -1,7 +1,25 @@
-let activeTabs = new Map(); // Track active scanning sessions
+interface TabData {
+  scanning: boolean;
+  results: SecretResult[];
+}
+
+interface SecretResult {
+  type: string;
+  pattern: string;
+  match: string;
+  source: string;
+  timestamp: string;
+}
+
+let activeTabs = new Map<number, TabData>(); // Track active scanning sessions
+
+interface Message {
+  action: string;
+  tabId: number;
+}
 
 // Message handling from popup
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: Message, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
   if (message.action === "startScanning") {
     startScanning(message.tabId);
     sendResponse({ status: "started" });
@@ -14,7 +32,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-async function startScanning(tabId: number) {
+async function startScanning(tabId: number): Promise<void> {
   try {
     // Attach debugger to the tab
     await chrome.debugger.attach({ tabId }, "1.3");
@@ -40,23 +58,23 @@ async function startScanning(tabId: number) {
   }
 }
 
-function setupEventListeners(tabId: number) {
+function setupEventListeners(tabId: number): void {
   // Listen for script parsed events
-  chrome.debugger.onEvent.addListener((source, method, params) => {
+  chrome.debugger.onEvent.addListener((source: chrome.debugger.Debuggee, method: string, params?: any) => {
     if (source.tabId === tabId && method === "Debugger.scriptParsed") {
       handleScriptParsed(tabId, params);
     }
   });
 
   // Listen for network response events
-  chrome.debugger.onEvent.addListener((source, method, params) => {
+  chrome.debugger.onEvent.addListener((source: chrome.debugger.Debuggee, method: string, params?: any) => {
     if (source.tabId === tabId && method === "Network.responseReceived") {
       handleNetworkResponse(tabId, params);
     }
   });
 }
 
-async function handleScriptParsed(tabId, params) {
+async function handleScriptParsed(tabId: number, params: any): Promise<void> {
   const tabData = activeTabs.get(tabId);
   if (!tabData || !tabData.scanning) return;
 
@@ -76,7 +94,7 @@ async function handleScriptParsed(tabId, params) {
   }
 }
 
-async function handleNetworkResponse(tabId, params) {
+async function handleNetworkResponse(tabId: number, params: any): Promise<void> {
   const tabData = activeTabs.get(tabId);
   if (!tabData || !tabData.scanning) return;
 
@@ -101,12 +119,12 @@ async function handleNetworkResponse(tabId, params) {
   }
 }
 
-function scanForSecrets(tabId, content, source) {
+function scanForSecrets(tabId: number, content: string, source: string): void {
   const tabData = activeTabs.get(tabId);
   if (!tabData) return;
 
   // Simple secret patterns - can be extended
-  const secretPatterns = [
+  const secretPatterns: RegExp[] = [
     /-----BEGIN PRIVATE KEY-----/g,
     /-----BEGIN RSA PRIVATE KEY-----/g,
     /-----BEGIN EC PRIVATE KEY-----/g,
@@ -114,10 +132,10 @@ function scanForSecrets(tabId, content, source) {
     /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g, // Slack bot token
   ];
 
-  secretPatterns.forEach((pattern) => {
+  secretPatterns.forEach((pattern: RegExp) => {
     const matches = content.match(pattern);
     if (matches) {
-      matches.forEach((match) => {
+      matches.forEach((match: string) => {
         tabData.results.push({
           type: "secret_found",
           pattern: pattern.source,
@@ -130,7 +148,7 @@ function scanForSecrets(tabId, content, source) {
   });
 }
 
-async function stopScanning(tabId: number) {
+async function stopScanning(tabId: number): Promise<void> {
   try {
     await chrome.debugger.detach({ tabId });
     activeTabs.delete(tabId);
@@ -141,7 +159,7 @@ async function stopScanning(tabId: number) {
 }
 
 // Clean up when tab is closed
-chrome.tabs.onRemoved.addListener((tabId) => {
+chrome.tabs.onRemoved.addListener((tabId: number) => {
   if (activeTabs.has(tabId)) {
     stopScanning(tabId);
   }
