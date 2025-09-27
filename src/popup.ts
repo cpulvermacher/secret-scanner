@@ -1,4 +1,5 @@
 import type { SecretResult } from "./background";
+import manifest from "./manifest.json";
 
 let currentTabId: number | null = null;
 let isScanning: boolean = false;
@@ -48,6 +49,7 @@ function startScanning(tabId: number): void {
             if (response.status === "started") {
                 isScanning = true;
                 updateUI();
+                updateIcon(tabId, "active");
 
                 // Poll for results every 2 seconds
                 pollForResults();
@@ -68,6 +70,7 @@ function stopScanning(tabId: number): void {
             if (response.status === "stopped") {
                 isScanning = false;
                 updateUI();
+                updateIcon(tabId, "disabled");
             }
         },
     );
@@ -84,6 +87,7 @@ function checkScanningStatus(): void {
         (response: { isScanning?: boolean }) => {
             isScanning = response?.isScanning || false;
             updateUI();
+            updateIcon(currentTabId, isScanning ? "active" : "disabled");
         },
     );
 }
@@ -141,9 +145,9 @@ function displayResults(results: SecretResult[]): void {
         .join("");
 
     // Add click listeners to source links
-    const sourceLinks = resultsList.querySelectorAll('.source-link');
+    const sourceLinks = resultsList.querySelectorAll(".source-link");
     sourceLinks.forEach((link) => {
-        link.addEventListener('click', (e) => {
+        link.addEventListener("click", (e) => {
             e.preventDefault();
             const url = (e.target as HTMLElement).dataset.url;
             if (url && isValidUrl(url)) {
@@ -174,4 +178,10 @@ function formatSourceLink(source: string): string {
         return `<a href="#" class="source-link" data-url="${escapeHtml(viewSourceUrl)}">${escapeHtml(source)}</a>`;
     }
     return escapeHtml(source);
+}
+
+function updateIcon(tabId: number, state: "active" | "disabled"): void {
+    const iconPaths =
+        state === "active" ? manifest.icons : manifest.action?.default_icon;
+    chrome.action.setIcon({ tabId, path: iconPaths });
 }

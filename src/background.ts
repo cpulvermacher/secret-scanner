@@ -178,7 +178,7 @@ async function stopScanning(tabId: number): Promise<void> {
 
 function updateBadge(tabId: number, count: number | undefined): void {
     const badgeText = count !== undefined ? count.toString() : "";
-    const badgeColor = count ? "#FF4444" : "#4CAF50";
+    const badgeColor = "#FF4444";
 
     chrome.action.setBadgeText({ text: badgeText, tabId });
     chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
