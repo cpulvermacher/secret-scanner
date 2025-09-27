@@ -77,7 +77,9 @@ function stopScanning(tabId: number): void {
 }
 
 function checkScanningStatus(): void {
-    if (currentTabId === null) return;
+    if (currentTabId === null) {
+        return;
+    }
 
     chrome.runtime.sendMessage(
         {
@@ -85,6 +87,9 @@ function checkScanningStatus(): void {
             tabId: currentTabId,
         },
         (response: { isScanning?: boolean }) => {
+            if (currentTabId === null) {
+                return;
+            }
             isScanning = response?.isScanning || false;
             updateUI();
             updateIcon(currentTabId, isScanning ? "active" : "disabled");
