@@ -1,3 +1,5 @@
+import { scan } from "./scanner";
+
 interface TabData {
     scanning: boolean;
     results: SecretResult[];
@@ -128,33 +130,18 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
 
     const previousCount = tabData.results.length;
 
-    // Simple secret patterns - can be extended
-    const secretPatterns: RegExp[] = [
-        /-----BEGIN PRIVATE KEY-----/g,
-        /-----BEGIN RSA PRIVATE KEY-----/g,
-        /-----BEGIN EC PRIVATE KEY-----/g,
-        /sk_live_[a-zA-Z0-9]{24}/g, // Stripe secret key
-        /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g, // Slack bot token
-        /api[_-]?key\s*[:=]\s*['"][^'"]+['"]/gi,
-    ];
+    const results = scan(content);
+    results.forEach((result) => {
+        const isDuplicate = tabData.results.some(
+            (existing) =>
+                existing.match === result.match && existing.source === source,
+        );
 
-    secretPatterns.forEach((pattern: RegExp) => {
-        const matches = content.match(pattern);
-        if (matches) {
-            matches.forEach((match: string) => {
-                const isDuplicate = tabData.results.some(
-                    (existing) =>
-                        existing.match === match && existing.source === source,
-                );
-
-                if (!isDuplicate) {
-                    tabData.results.push({
-                        pattern: pattern.source,
-                        match: match,
-                        source: source,
-                        timestamp: new Date().toISOString(),
-                    });
-                }
+        if (!isDuplicate) {
+            tabData.results.push({
+                source: source,
+                timestamp: new Date().toISOString(),
+                ...result,
             });
         }
     });
