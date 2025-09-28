@@ -1,0 +1,13 @@
+{
+    "typescript.tsc.autoDetect": "off",
+    "typescript.format.semicolons": "insert",
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[yaml]": {
+        "editor.formatOnSave": false
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always"
+    }
+}
