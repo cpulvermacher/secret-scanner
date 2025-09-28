@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 
 const entryPoints = ["/background.ts"];
 // get basename without extension
