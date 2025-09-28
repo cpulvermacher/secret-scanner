@@ -1,12 +1,13 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="popup.css" />
     </head>
     <body>
         <div class="header">
-            <div class="title">Secret Scanner</div>
+            <h1 class="title">Secret Scanner</h1>
         </div>
 
         <div class="status">
@@ -19,6 +20,10 @@
         <div class="results">
             <div id="resultsList"></div>
         </div>
+        <footer id="caution" class="invisible">
+            Possible secrets detected should be reviewed manually. False
+            positives are possible.
+        </footer>
 
         <script type="module" src="popup.ts"></script>
     </body>

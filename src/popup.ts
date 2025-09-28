@@ -25,6 +25,7 @@ const toggleButton = document.getElementById(
     "toggleButton",
 ) as HTMLButtonElement;
 const resultsList = document.getElementById("resultsList") as HTMLElement;
+const cautionText = document.getElementById("caution") as HTMLElement;
 
 // Toggle scanning
 toggleButton.addEventListener("click", (): void => {
@@ -134,6 +135,8 @@ function displayResults(results: SecretResult[]): void {
     if (results.length === 0) {
         resultsList.innerHTML =
             '<div class="no-results">No secrets found</div>';
+        cautionText.className = "invisible";
+
         return;
     }
 
@@ -160,6 +163,8 @@ function displayResults(results: SecretResult[]): void {
             }
         });
     });
+
+    cautionText.className = "visible";
 }
 
 function escapeHtml(text: string): string {
