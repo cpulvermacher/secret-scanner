@@ -37,14 +37,13 @@ body {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-}
 
-.status-indicator.active {
-    background-color: #22c55e;
-}
-
-.status-indicator.inactive {
-    background-color: #ef4444;
+    &.active {
+        background-color: #22c55e;
+    }
+    &.inactive {
+        background-color: #ef4444;
+    }
 }
 
 button {
@@ -56,19 +55,27 @@ button {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #7a1212;
+    }
+    &:active {
+        background-color: #600e0e;
+    }
+    &:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+    }
 }
 
-button:hover {
-    background-color: #7a1212;
-}
+a {
+    color: #3b82f6;
+    text-decoration: underline;
+    cursor: pointer;
 
-button:active {
-    background-color: #600e0e;
-}
-
-button:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
+    &:hover {
+        color: #2563eb;
+    }
 }
 
 .results {
@@ -93,16 +100,6 @@ button:disabled {
     font-size: 12px;
     color: #6b7280;
     word-break: break-all;
-}
-
-.source-link {
-    color: #3b82f6;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.source-link:hover {
-    color: #2563eb;
 }
 
 .result-match {
