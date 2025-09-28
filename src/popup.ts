@@ -184,8 +184,8 @@ function isValidUrl(string: string): boolean {
 
 function formatSourceLink(source: string): string {
     if (isValidUrl(source)) {
-        const viewSourceUrl = `view-source:${source}`;
-        return `<a href="#" class="source-link" data-url="${escapeHtml(viewSourceUrl)}">${escapeHtml(source)}</a>`;
+        const viewSourceUrl = `view-source:${encodeURI(source)}`;
+        return `<a href="#" class="source-link" data-url="${viewSourceUrl}">${escapeHtml(source)}</a>`;
     }
     return escapeHtml(source);
 }
