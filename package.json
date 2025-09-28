@@ -1,7 +1,7 @@
 {
     "name": "secret-scanner",
     "version": "1.0.0",
-    "license": "ISC",
+    "license": "MIT",
     "private": true,
     "scripts": {
         "build": "sh ./util/build.sh production",
