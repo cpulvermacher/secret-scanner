@@ -22,9 +22,7 @@ export function scan(content: string): Secret[] {
 }
 
 const secretPatterns: RegExp[] = [
-    /-----BEGIN PRIVATE KEY-----/g,
-    /-----BEGIN RSA PRIVATE KEY-----/g,
-    /-----BEGIN EC PRIVATE KEY-----/g,
+    /-----BEGIN .*PRIVATE KEY-----[\s\S]*?-----END .*PRIVATE KEY-----/g,
     /sk_live_[a-zA-Z0-9]{24}/g, // Stripe secret key
     /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g, // Slack bot token
     /api[_-]?key\s*[:=]\s*['"][^'"]+['"]/gi,
