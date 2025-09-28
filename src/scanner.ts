@@ -43,6 +43,6 @@ const secretPatterns = [
     },
     {
         type: "password",
-        pattern: /passw(?:or)d\s*[:=]\s*['"][^'"]+['"]/gi,
+        pattern: /passw(or)?d\s*[:=]\s*['"][^'"]+['"]/gi,
     },
 ];

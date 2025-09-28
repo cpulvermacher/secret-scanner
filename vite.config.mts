@@ -7,6 +7,9 @@ const scriptNames = entryPoints.map(
 );
 export default defineConfig(({ mode }) => ({
     root: "src",
+    test: {
+        root: "src/test",
+    },
     esbuild: {
         pure: mode === "production" ? ["console.log"] : [],
     },
