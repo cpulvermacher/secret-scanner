@@ -157,9 +157,9 @@ function displayResults(results: SecretResult[]): void {
     sourceLinks.forEach((link) => {
         link.addEventListener("click", (e) => {
             e.preventDefault();
-            const url = (e.target as HTMLElement).dataset.url;
+            const url = (e.target as HTMLAnchorElement).href;
             if (url && isValidUrl(url)) {
-                chrome.tabs.create({ url });
+                chrome.tabs.create({ url: "view-source:" + url });
             }
         });
     });
@@ -184,8 +184,7 @@ function isValidUrl(string: string): boolean {
 
 function formatSourceLink(source: string): string {
     if (isValidUrl(source)) {
-        const viewSourceUrl = `view-source:${encodeURI(source)}`;
-        return `<a href="#" class="source-link" data-url="${viewSourceUrl}">${escapeHtml(source)}</a>`;
+        return `<a class="source-link" href="${encodeURI(source)}">${escapeHtml(source)}</a>`;
     }
     return escapeHtml(source);
 }
