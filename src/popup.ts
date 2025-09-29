@@ -1,5 +1,5 @@
 import type { SecretResult } from "./background";
-import manifest from "./manifest.json";
+import { updateIcon } from "./icon";
 
 let currentTabId: number | null = null;
 let isScanning: boolean = false;
@@ -187,10 +187,4 @@ function formatSourceLink(source: string): string {
         return `<a class="source-link" href="${encodeURI(source)}">${escapeHtml(source)}</a>`;
     }
     return escapeHtml(source);
-}
-
-function updateIcon(tabId: number, state: "active" | "disabled"): void {
-    const iconPaths =
-        state === "active" ? manifest.icons : manifest.action?.default_icon;
-    chrome.action.setIcon({ tabId, path: iconPaths });
 }

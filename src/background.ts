@@ -1,3 +1,4 @@
+import { updateBadge } from "./icon";
 import { scan } from "./scanner";
 
 interface TabData {
@@ -135,8 +136,6 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
     const tabData = activeTabs.get(tabId);
     if (!tabData) return;
 
-    const previousCount = tabData.results.length;
-
     const results = scan(content);
     results.forEach((result) => {
         const isDuplicate = tabData.results.some(
@@ -153,10 +152,7 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
         }
     });
 
-    // Update badge if new secrets were found
-    if (tabData.results.length > previousCount) {
-        updateBadge(tabId, tabData.results.length);
-    }
+    updateBadge(tabId, tabData.results.length);
 }
 
 async function stopScanning(tabId: number): Promise<void> {
@@ -168,14 +164,6 @@ async function stopScanning(tabId: number): Promise<void> {
     activeTabs.delete(tabId);
 
     await chrome.debugger.detach({ tabId });
-}
-
-function updateBadge(tabId: number, count: number | undefined): void {
-    const badgeText = count !== undefined ? count.toString() : "";
-    const badgeColor = "#FF4444";
-
-    chrome.action.setBadgeText({ text: badgeText, tabId });
-    chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
 }
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
