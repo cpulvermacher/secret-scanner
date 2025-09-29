@@ -159,7 +159,7 @@ function displayResults(results: SecretResult[]): void {
             e.preventDefault();
             const url = (e.target as HTMLAnchorElement).href;
             if (url && isValidUrl(url)) {
-                chrome.tabs.create({ url: "view-source:" + url });
+                chrome.tabs.create({ url: `view-source:${url}` });
             }
         });
     });
