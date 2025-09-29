@@ -80,6 +80,13 @@ if (!chrome.debugger.onEvent.hasListener(handleDebuggerEvent)) {
     chrome.debugger.onEvent.addListener(handleDebuggerEvent);
 }
 
+chrome.debugger.onDetach.addListener((source) => {
+    const tabId = source.tabId;
+    if (tabId !== undefined) {
+        updateBadge(tabId, undefined);
+    }
+});
+
 function handleDebuggerEvent(
     source: chrome.debugger.Debuggee,
     method: string,
@@ -185,7 +192,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     void updateBadge(tabId, count);
 });
 
-// Clean up when tab is closed
 chrome.tabs.onRemoved.addListener((tabId: number) => {
     if (activeTabs.has(tabId)) {
         void stopScanning(tabId);
