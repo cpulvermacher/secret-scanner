@@ -1,20 +1,12 @@
 import type { SecretResult } from "./background";
+import { getActiveTabId } from "./browser";
 import { updateIcon } from "./icon";
 
-let currentTabId: number | null = null;
-let isScanning: boolean = false;
-
 // Get current tab and initialize UI
-chrome.tabs.query(
-    { active: true, currentWindow: true },
-    (tabs: chrome.tabs.Tab[]) => {
-        if (tabs[0]?.id) {
-            currentTabId = tabs[0].id;
-            checkScanningStatus();
-            loadResults();
-        }
-    },
-);
+const currentTabId = await getActiveTabId();
+let isScanning: boolean = false;
+checkScanningStatus(currentTabId);
+loadResults(currentTabId);
 
 // UI elements
 const statusIndicator = document.getElementById(
@@ -29,9 +21,6 @@ const cautionText = document.getElementById("caution") as HTMLElement;
 
 // Toggle scanning
 toggleButton.addEventListener("click", (): void => {
-    if (currentTabId === null) {
-        return;
-    }
     if (isScanning) {
         stopScanning(currentTabId);
     } else {
@@ -77,32 +66,25 @@ function stopScanning(tabId: number): void {
     );
 }
 
-function checkScanningStatus(): void {
-    if (currentTabId === null) {
-        return;
-    }
-
+function checkScanningStatus(tabId: number): void {
     chrome.runtime.sendMessage(
         {
             action: "getStatus",
-            tabId: currentTabId,
+            tabId,
         },
         (response: { isScanning?: boolean }) => {
-            if (currentTabId === null) {
-                return;
-            }
             isScanning = response?.isScanning || false;
             updateUI();
-            updateIcon(currentTabId, isScanning ? "active" : "inactive");
+            updateIcon(tabId, isScanning ? "active" : "inactive");
         },
     );
 }
 
-function loadResults(): void {
+function loadResults(tabId: number): void {
     chrome.runtime.sendMessage(
         {
             action: "getResults",
-            tabId: currentTabId,
+            tabId,
         },
         (response: { results?: SecretResult[] }) => {
             if (response?.results) {
@@ -113,8 +95,8 @@ function loadResults(): void {
 }
 
 function pollForResults(): void {
-    if (isScanning) {
-        loadResults();
+    if (isScanning && currentTabId !== null) {
+        loadResults(currentTabId);
         setTimeout(pollForResults, 1000);
     }
 }
