@@ -71,7 +71,7 @@ function stopScanning(tabId: number): void {
             if (response.status === "stopped") {
                 isScanning = false;
                 updateUI();
-                updateIcon(tabId, "disabled");
+                updateIcon(tabId, "inactive");
             }
         },
     );
@@ -93,7 +93,7 @@ function checkScanningStatus(): void {
             }
             isScanning = response?.isScanning || false;
             updateUI();
-            updateIcon(currentTabId, isScanning ? "active" : "disabled");
+            updateIcon(currentTabId, isScanning ? "active" : "inactive");
         },
     );
 }

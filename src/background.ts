@@ -1,4 +1,4 @@
-import { updateBadge } from "./icon";
+import { updateIcon } from "./icon";
 import { scan } from "./scanner";
 
 interface TabData {
@@ -58,7 +58,7 @@ chrome.runtime.onMessage.addListener(
 
 async function startScanning(tabId: number): Promise<void> {
     // Clear any existing badge
-    updateBadge(tabId, 0);
+    updateIcon(tabId, "active", 0);
 
     // Attach debugger to the tab
     await chrome.debugger.attach({ tabId }, "1.3");
@@ -84,7 +84,7 @@ if (!chrome.debugger.onEvent.hasListener(handleDebuggerEvent)) {
 chrome.debugger.onDetach.addListener((source) => {
     const tabId = source.tabId;
     if (tabId !== undefined) {
-        updateBadge(tabId, undefined);
+        updateIcon(tabId, "inactive");
     }
 });
 
@@ -152,7 +152,7 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
         }
     });
 
-    updateBadge(tabId, tabData.results.length);
+    updateIcon(tabId, "active", tabData.results.length);
 }
 
 async function stopScanning(tabId: number): Promise<void> {
@@ -167,8 +167,13 @@ async function stopScanning(tabId: number): Promise<void> {
 }
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-    const count = activeTabs.get(activeInfo.tabId)?.results.length;
-    void updateBadge(activeInfo.tabId, count);
+    const tabData = activeTabs.get(activeInfo.tabId);
+    if (tabData) {
+        const count = tabData.results.length;
+        void updateIcon(activeInfo.tabId, "active", count);
+    } else {
+        void updateIcon(activeInfo.tabId, "inactive", 0);
+    }
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
@@ -176,8 +181,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
         return; // url unchanged, nothing to do
     }
 
-    const count = activeTabs.get(tabId)?.results.length;
-    void updateBadge(tabId, count);
+    const tabData = activeTabs.get(tabId);
+    if (tabData) {
+        const count = tabData.results.length;
+        void updateIcon(tabId, "active", count);
+    } else {
+        void updateIcon(tabId, "inactive", 0);
+    }
 });
 
 chrome.tabs.onRemoved.addListener((tabId: number) => {
