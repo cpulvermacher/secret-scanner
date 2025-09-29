@@ -52,7 +52,7 @@ create_zip() {
 
 if [ "$MODE" = "production" ]; then
     create_zip "$PWD/$APP_NAME-$LONG_VERSION-chrome.zip" dist/chrome
-    create_zip "$PWD/$APP_NAME-$LONG_VERSION-firefox.zip" dist/firefox
+    # create_zip "$PWD/$APP_NAME-$LONG_VERSION-firefox.zip" dist/firefox
 
     # create a source code bundle by cloning the repo and zipping it
     TMP_DIR=$(mktemp -d)
