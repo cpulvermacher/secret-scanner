@@ -147,7 +147,7 @@ function displayResults(results: SecretResult[]): void {
         });
     });
 
-    cautionText.className = "visible";
+    cautionText.className = "";
 }
 
 function escapeHtml(text: string): string {
