@@ -95,13 +95,14 @@ function loadResults(tabId: number): void {
 }
 
 function pollForResults(): void {
-    if (isScanning && currentTabId !== null) {
+    if (isScanning) {
         loadResults(currentTabId);
         setTimeout(pollForResults, 1000);
     }
 }
 
 function updateUI(): void {
+    toggleButton.disabled = false;
     if (isScanning) {
         statusIndicator.className = "status-indicator active";
         statusText.textContent = "Scanning page for secrets...";
