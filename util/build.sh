@@ -10,7 +10,7 @@ fi
 
 ROOT=$(dirname -- "$0")/..
 APP_NAME="secret-scanner"
-VERSION=$(git describe --tags --abbrev=0 | sed '')
+VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
 LONG_VERSION=$(git describe --tags | sed 's/^v//')
 if [ "$MODE" = "dev" ]; then
     LONG_VERSION="$LONG_VERSION-dev"
