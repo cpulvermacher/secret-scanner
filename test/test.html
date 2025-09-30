@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secret Scanner Test Page</title>
+</head>
+<body>
+    <h1>Test Page for Secret Detection</h1>
+    <p>This page loads JavaScript with embedded secrets for testing.</p>
+
+    <script>
+        // Inline script with a fake private key
+        const fakePrivateKey = `-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7VJTUt9Us8cKB
+wjXVn7peBJQltcVHHh16JEK5OZrqBKNHdIHjwEdSHo4cCbp7y0GBFVB9XPZlWf5T
+vWN4r1ZQRhVfhUB8eOKaOsAT1oWIJzNzNqmyFU9gTJMwNdOdC3F+5MRbVzw8cQmG
+-----END PRIVATE KEY-----`;
+
+        // Another fake secret pattern
+        const stripeKey = "sk_live_1234567890123456789012345678901234567890";
+
+        console.log("Test secrets loaded in inline script");
+    </script>
+
+    <script src="external-test.js"></script>
+</body>
+</html>
