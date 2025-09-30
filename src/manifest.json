@@ -5,7 +5,7 @@
     "version": "__VERSION__",
     "version_name": "__VERSION_NAME__",
     "minimum_chrome_version": "140",
-    "permissions": ["debugger", "activeTab", "storage"],
+    "permissions": ["debugger", "activeTab"],
     "background": {
         "service_worker": "background.js",
         "type": "module"
@@ -25,7 +25,6 @@
         "48": "images/icon-48.png",
         "128": "images/icon-128.png"
     },
-    "host_permissions": ["<all_urls>"],
     "content_security_policy": {
         "extension_pages": "default-src 'self'; img-src 'self' data:;"
     }
