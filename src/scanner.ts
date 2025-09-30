@@ -1,8 +1,10 @@
 export interface Secret {
-    type: string;
+    type: SecretType;
     pattern: string;
     match: string; // the found secret
 }
+
+export type SecretType = (typeof secretPatterns)[number]["type"];
 
 export function scan(content: string): Secret[] {
     const results: Secret[] = [];
@@ -45,4 +47,4 @@ const secretPatterns = [
         type: "password",
         pattern: /passw(or)?d\s*[:=]\s*['"][^'"]+['"]/gi,
     },
-];
+] as const;

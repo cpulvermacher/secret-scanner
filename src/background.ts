@@ -1,14 +1,12 @@
 import { updateIcon } from "./icon";
-import { scan } from "./scanner";
+import { scan, type Secret } from "./scanner";
 
 interface TabData {
     scanning: boolean;
     results: SecretResult[];
 }
 
-export interface SecretResult {
-    pattern: string;
-    match: string; // the found secret
+export interface SecretResult extends Secret {
     source: string; // source URL
     timestamp: string;
 }

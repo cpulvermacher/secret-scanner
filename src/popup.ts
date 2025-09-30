@@ -1,6 +1,7 @@
 import type { SecretResult } from "./background";
 import { getActiveTabId } from "./browser";
 import { updateIcon } from "./icon";
+import type { SecretType } from "./scanner";
 
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
@@ -127,7 +128,7 @@ function displayResults(results: SecretResult[]): void {
         .map(
             (result: SecretResult) => `
     <div class="result-item">
-      <div class="result-type">Secret Detected</div>
+      <div class="result-type">${escapeHtml(getTypeTitle(result.type))}</div>
       <div class="result-match">${escapeHtml(result.match.substring(0, 100))}${result.match.length > 100 ? "..." : ""}</div>
       <div class="result-source">Source: ${formatSourceLink(result.source)}</div>
     </div>
@@ -170,4 +171,19 @@ function formatSourceLink(source: string): string {
         return `<a class="source-link" href="${encodeURI(source)}">${escapeHtml(source)}</a>`;
     }
     return escapeHtml(source);
+}
+
+function getTypeTitle(type: SecretType): string {
+    switch (type) {
+        case "privateKey":
+            return "Private Key";
+        case "stripeAccessToken":
+            return "Stripe Access Token";
+        case "slackBotToken":
+            return "Slack Bot Token";
+        case "apiKey":
+            return "API Key";
+        case "password":
+            return "Password";
+    }
 }
