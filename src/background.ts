@@ -62,10 +62,9 @@ async function startScanning(tabId: number): Promise<void> {
     await chrome.debugger.attach({ tabId }, "1.3");
 
     // Initialize tab tracking
-    activeTabs.set(tabId, {
-        scanning: true,
-        results: [],
-    });
+    const tabData = activeTabs.get(tabId) ?? { scanning: false, results: [] };
+    tabData.scanning = true;
+    activeTabs.set(tabId, tabData);
 
     // Enable Debugger domain to catch script parsing
     await chrome.debugger.sendCommand({ tabId }, "Debugger.enable");
@@ -155,11 +154,13 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
 
 async function stopScanning(tabId: number): Promise<void> {
     const tabData = activeTabs.get(tabId);
+    if (tabData) {
+        tabData.scanning = false;
+    }
     if (tabData && tabData.results.length === 0) {
         // Clear badge if no secrets were found
         chrome.action.setBadgeText({ text: "", tabId });
     }
-    activeTabs.delete(tabId);
 
     await chrome.debugger.detach({ tabId });
 }
@@ -190,6 +191,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 
 chrome.tabs.onRemoved.addListener((tabId: number) => {
     if (activeTabs.has(tabId)) {
+        activeTabs.delete(tabId);
         void stopScanning(tabId);
     }
 });
