@@ -1,5 +1,6 @@
 import type { SecretResult } from "./background";
 import { getActiveTabId } from "./browser";
+import { filterWithReason } from "./filter";
 import { updateIcon } from "./icon";
 import type { SecretType } from "./scanner";
 
@@ -125,6 +126,7 @@ function displayResults(results: SecretResult[]): void {
     }
 
     resultsList.innerHTML = results
+        .filter((secret) => filterWithReason(secret) === null)
         .map(
             (result: SecretResult) => `
     <div class="result-item">
