@@ -125,13 +125,14 @@ function displayResults(results: SecretResult[]): void {
         return;
     }
 
+    const maxMatchLength = 1000;
     resultsList.innerHTML = results
         .filter((secret) => filterWithReason(secret) === null)
         .map(
             (result: SecretResult) => `
     <div class="result-item">
       <div class="result-type">${escapeHtml(getTypeTitle(result.type))}</div>
-      <div class="result-match">${escapeHtml(result.match.substring(0, 100))}${result.match.length > 100 ? "..." : ""}</div>
+      <div class="result-match">${escapeHtml(result.match.substring(0, maxMatchLength))}${result.match.length > maxMatchLength ? "..." : ""}</div>
       <div class="result-source">Source: ${formatSourceLink(result.source)}</div>
     </div>
   `,

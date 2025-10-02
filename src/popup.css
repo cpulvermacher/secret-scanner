@@ -109,6 +109,7 @@ a {
     padding: 4px;
     border-radius: 3px;
     margin: 4px 0;
+    overflow-x: auto;
 }
 
 .no-results {
