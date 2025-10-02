@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.2.0]
+## [0.2.1]
 
 - Show type of discovered secrets
 - Filter matches from browser extension content scripts (e.g. password managers)
