@@ -30,13 +30,13 @@ jobs:
               with:
                   name: time-travel-${{ github.ref_name }}-chrome
                   path: dist/chrome
-            # - name: Upload to Chrome Web Store
-            #   env:
-            #     CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-            #     CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-            #     REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-            #     EXTENSION_ID: jfdbpgcmmenmelcghpbbkldkcfiejcjg
-            #   run: cd dist/chrome && npx chrome-webstore-upload upload
+            - name: Upload to Chrome Web Store
+              env:
+                  CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+                  CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+                  REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+                  EXTENSION_ID: jfcojfckgmgepklcdmmjfgjcgfngckbk
+              run: cd dist/chrome && npx chrome-webstore-upload upload
             # - name: Upload to AMO
             #   env:
             #     WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
