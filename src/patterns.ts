@@ -23,12 +23,12 @@ const patterns = [
     },
     {
         type: "apiKey",
-        pattern: /api[_-]?key\s*[:=]\s*['"][^'"]+['"]/gi,
+        pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{6,}['"]/gi,
         ignore: /['"](\))?\.concat\(/i,
     },
     {
         type: "password",
-        pattern: /passw(or)?d\s*[:=]\s*['"][^'"]+['"]/gi,
+        pattern: /passw(or)?d\s*[:=]\s*['"][^'"]{4,}['"]/gi,
         ignore: /['"]([^'"]*password['"]|(\))?\.concat\()/i,
     },
 ] as const;
