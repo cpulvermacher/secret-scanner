@@ -74,6 +74,16 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
         );
     });
 
+    it("should detect same secret only once", () => {
+        const content = `
+				const apiKey = 'xoxb-12345678901-12345678901-abcdefghijklmnopqrstuvwx';
+			`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].type).toBe("slackBotToken");
+    });
+
     it("should detect API keys with various formats", () => {
         const content = `
 				const config = {
