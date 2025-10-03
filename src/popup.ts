@@ -2,7 +2,7 @@ import type { SecretResult } from "./background";
 import { getActiveTabId } from "./browser";
 import { filterWithReason } from "./filter";
 import { updateIcon } from "./icon";
-import type { SecretType } from "./scanner";
+import type { SecretType } from "./patterns";
 
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
