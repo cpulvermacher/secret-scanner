@@ -188,10 +188,13 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
     });
 
     it("should ignore .concat code artifacts in passwords", () => {
-        const content = `"password: ".concat(e instanceof Error?g.message:"?")`;
-        const result = scan(content);
-
+        const result = scan(
+            `"password: ".concat(e instanceof Error?g.message:"?")`,
+        );
         expect(result).toHaveLength(0);
+
+        const result2 = scan(`"password: ").concat("abc")`);
+        expect(result2).toHaveLength(0);
     });
 
     it("should still detect real passwords after filtering", () => {
