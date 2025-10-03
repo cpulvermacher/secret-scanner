@@ -9,22 +9,33 @@ export type SecretType = (typeof secretPatterns)[number]["type"];
 export function scan(content: string): Secret[] {
     const results: Secret[] = [];
 
-    secretPatterns.forEach((secretPattern) => {
+    typedPatterns.forEach((secretPattern) => {
         const matches = content.match(secretPattern.pattern);
-        if (matches) {
-            matches.forEach((match: string) => {
-                results.push({
-                    type: secretPattern.type,
-                    pattern: secretPattern.pattern.source,
-                    match: match,
-                });
-            });
+        if (!matches) {
+            return;
         }
+        matches.forEach((match: string) => {
+            // Skip if match should be ignored
+            if (secretPattern.ignore?.test(match)) {
+                return;
+            }
+
+            results.push({
+                type: secretPattern.type,
+                pattern: secretPattern.pattern.source,
+                match: match,
+            });
+        });
     });
 
     return results;
 }
 
+type SecretPattern = {
+    type: SecretType;
+    pattern: RegExp;
+    ignore?: RegExp;
+};
 const secretPatterns = [
     {
         type: "privateKey",
@@ -42,9 +53,13 @@ const secretPatterns = [
     {
         type: "apiKey",
         pattern: /api[_-]?key\s*[:=]\s*['"][^'"]+['"]/gi,
+        ignore: /['"]\.concat\(/i,
     },
     {
         type: "password",
         pattern: /passw(or)?d\s*[:=]\s*['"][^'"]+['"]/gi,
+        ignore: /['"]([^'"]*password['"]|\.concat\()/i,
     },
 ] as const;
+
+const typedPatterns: readonly SecretPattern[] = secretPatterns;

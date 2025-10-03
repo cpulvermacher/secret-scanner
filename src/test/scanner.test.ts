@@ -165,7 +165,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const content = `
 				const config = {
 					API_KEY: "uppercase-api-key",
-					Password: "mixed-case-password"
+					Password: "mixed-case-something"
 				};
 			`;
         const result = scan(content);
@@ -173,5 +173,50 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         expect(result).toHaveLength(2);
         expect(result.some((s) => s.type === "apiKey")).toBe(true);
         expect(result.some((s) => s.type === "password")).toBe(true);
+    });
+
+    it("should ignore placeholder passwords", () => {
+        const content = `
+				const config = {
+					password: "password",
+					okta_password: "okta_password"
+				};
+			`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(0);
+    });
+
+    it("should ignore .concat code artifacts in passwords", () => {
+        const content = `"password: ".concat(e instanceof Error?g.message:"?")`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(0);
+    });
+
+    it("should still detect real passwords after filtering", () => {
+        const content = `
+				const config = {
+					password: "password",
+					real_password: "actualSecret123"
+				};
+			`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].type).toBe("password");
+        expect(result[0].match).toContain('"actualSecret123"');
+    });
+
+    it("should ignore mixed case placeholder passwords", () => {
+        const content = `
+				const config = {
+					PASSWORD: "PASSWORD",
+					Password: "Password"
+				};
+			`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(0);
     });
 });
