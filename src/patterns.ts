@@ -24,7 +24,7 @@ const patterns = [
     {
         type: "apiKey",
         pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{6,}['"]/gi,
-        ignore: /['"](\))?\.concat\(/i,
+        ignore: /['"]((\))?\.concat\(|.*api[_-]?key)/i,
     },
     {
         type: "password",

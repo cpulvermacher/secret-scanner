@@ -119,7 +119,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
     it("should detect multiple different secret types in one scan", () => {
         const content = `
 				const config = {
-					apiKey: "secret-api-key-123",
+					apiKey: "secret--key-123",
 					password: "mypassword123",
 					stripeKey: "sk_test_51H8L9fJyKzNmJqS7QkV4Kq3"
 				};
@@ -159,7 +159,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
 							password: "db-secret-123"
 						},
 						api: {
-							api_key: "api-key-456"
+							api_key: "secret-key-456"
 						}
 					};
 				}
@@ -174,7 +174,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
     it("should be case insensitive for API keys and passwords", () => {
         const content = `
 				const config = {
-					API_KEY: "uppercase-api-key",
+					API_KEY: "uppercase-key",
 					Password: "mixed-case-something"
 				};
 			`;
@@ -236,5 +236,19 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const result = scan(content);
 
         expect(result).toHaveLength(0);
+    });
+
+    it("should ignore placeholder API keys", () => {
+        const content = `
+                someApiKey: "<place your_api_key here>",
+                someOtherApiKey: "MYAPIKEY",
+                actualApiKey: 'actualSecret123'
+            `;
+
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].type).toBe("apiKey");
+        expect(result[0].match).toContain("'actualSecret123'");
     });
 });
