@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.2.2]
+
+- Filter more false positives
+
 ## [0.2.1]
 
 - Show type of discovered secrets
