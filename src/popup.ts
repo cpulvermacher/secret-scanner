@@ -103,10 +103,10 @@ function updateUI(): void {
 
     if (isDebuggerActive) {
         debuggerStatus.className = "";
-        toggleButton.textContent = "Stop Debugger";
+        toggleButton.textContent = "Stop Full Scan";
     } else if ("debugger" in chrome && errorsFound) {
         debuggerStatus.className = "";
-        toggleButton.textContent = "Enable Debugger & Reload";
+        toggleButton.textContent = "Start Full Scan & Reload";
     }
 }
 

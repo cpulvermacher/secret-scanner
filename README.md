@@ -12,7 +12,7 @@ A browser extension that scans JavaScript files loaded by websites for embedded 
 
 Pages are automatically scanned in the background, and the number of found secrets is shown in the extension icon in the toolbar. Click the extension icon to see details.
 
-Page security settings may prevent the extension from scanning some scripts. Optionally, you can click the extension icon and press "Enable Debugger & Reload". (only shown if needed)
+Page security settings may prevent the extension from scanning some scripts. Optionally, you can click the extension icon and press "Start Full Scan & Reload". (only shown if needed)
 
 ## Limitations
 
