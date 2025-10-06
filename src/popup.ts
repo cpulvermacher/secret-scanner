@@ -4,6 +4,10 @@ import { filterWithReason } from "./filter";
 import type { UserActionMessage } from "./messages";
 import type { SecretType } from "./patterns";
 
+const maxMatchLength = 1000;
+const maxErrorLength = 200;
+const maxUrlLength = 200;
+
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
 let errorsFound = false;
@@ -111,7 +115,6 @@ function displayResults(tab: TabData): void {
         return;
     }
 
-    const maxMatchLength = 1000;
     resultsList.innerHTML = tab.results
         .filter((secret) => filterWithReason(secret) === null)
         .map(
@@ -125,7 +128,6 @@ function displayResults(tab: TabData): void {
         )
         .join("");
 
-    const maxErrorLength = 200;
     errorList.innerHTML = tab.errors
         .map(
             (error) => `
@@ -170,7 +172,10 @@ function isValidUrl(string: string): boolean {
 
 function formatSourceLink(source: string): string {
     if (isValidUrl(source)) {
-        return `<a class="source-link" href="${encodeURI(source)}">${escapeHtml(source)}</a>`;
+        const displayedUrl =
+            source.substring(0, maxUrlLength) +
+            (source.length > maxUrlLength ? "..." : "");
+        return `<a class="source-link" href="${encodeURI(source)}">${escapeHtml(displayedUrl)}</a>`;
     }
     return escapeHtml(source);
 }
