@@ -1,10 +1,10 @@
 import { secretPatterns, type SecretType } from "./patterns";
 
-export interface Secret {
+export type Secret = {
     type: SecretType;
     pattern: string;
     match: string; // the found secret
-}
+};
 
 export function scan(content: string): Secret[] {
     const results: Secret[] = [];

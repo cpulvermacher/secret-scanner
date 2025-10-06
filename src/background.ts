@@ -18,10 +18,10 @@ export type ScriptFetchError = {
     error: string;
 };
 
-export interface SecretResult extends Secret {
+export type SecretResult = Secret & {
     source: string; // source URL
     timestamp: string;
-}
+};
 
 const tabs = new Map<number, TabData>(); // Track status per tab
 
@@ -123,10 +123,10 @@ function handleDebuggerEvent(
     }
 }
 
-interface ScriptParsedParams {
+type ScriptParsedParams = {
     url?: string;
     scriptId: string;
-}
+};
 async function handleScriptParsed(
     tabId: number,
     params?: ScriptParsedParams,
