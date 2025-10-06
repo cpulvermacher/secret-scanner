@@ -1,3 +1,4 @@
+import type { ScriptDetectedMessage, Message } from "./messages";
 import { updateIcon } from "./icon";
 import { scan, type Secret } from "./scanner";
 
@@ -13,43 +14,42 @@ export interface SecretResult extends Secret {
 
 const activeTabs = new Map<number, TabData>(); // Track active scanning sessions
 
-interface Message {
-    action: string;
-    tabId: number;
-}
-
-// Message handling from popup
+// Message handling from popup / content script
 chrome.runtime.onMessage.addListener(
     (
         message: Message,
-        _sender: chrome.runtime.MessageSender,
+        sender: chrome.runtime.MessageSender,
         sendResponse: (response?: object) => void,
     ) => {
-        if (message.action === "startScanning") {
-            startScanning(message.tabId)
-                .then(() => {
-                    sendResponse({ status: "started" });
-                })
-                .catch((error: Error) => {
-                    sendResponse({ status: "error", error });
-                });
-            return true; // Keep message channel open for async response
-        } else if (message.action === "stopScanning") {
-            stopScanning(message.tabId)
-                .then(() => {
-                    sendResponse({ status: "stopped" });
-                })
-                .catch((error: Error) => {
-                    sendResponse({ status: "error", error });
-                });
-            return true; // Keep message channel open for async response
-        } else if (message.action === "getResults") {
-            const results = activeTabs.get(message.tabId)?.results || [];
-            sendResponse({ results });
-        } else if (message.action === "getStatus") {
-            const tabData = activeTabs.get(message.tabId);
-            const isScanning = tabData?.scanning || false;
-            sendResponse({ isScanning });
+        if (message.type === "scriptDetected") {
+            handleScriptDetectedMessage(message, sender.tab?.id);
+        } else if (message.type === "userAction") {
+            if (message.action === "startScanning") {
+                startScanning(message.tabId)
+                    .then(() => {
+                        sendResponse({ status: "started" });
+                    })
+                    .catch((error: Error) => {
+                        sendResponse({ status: "error", error });
+                    });
+                return true; // Keep message channel open for async response
+            } else if (message.action === "stopScanning") {
+                stopScanning(message.tabId)
+                    .then(() => {
+                        sendResponse({ status: "stopped" });
+                    })
+                    .catch((error: Error) => {
+                        sendResponse({ status: "error", error });
+                    });
+                return true; // Keep message channel open for async response
+            } else if (message.action === "getResults") {
+                const results = activeTabs.get(message.tabId)?.results || [];
+                sendResponse({ results });
+            } else if (message.action === "getStatus") {
+                const tabData = activeTabs.get(message.tabId);
+                const isScanning = tabData?.scanning || false;
+                sendResponse({ isScanning });
+            }
         }
     },
 );
@@ -150,6 +150,39 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
     });
 
     updateIcon(tabId, "active", tabData.results.length);
+}
+
+async function handleScriptDetectedMessage(
+    msg: ScriptDetectedMessage,
+    tabId?: number,
+) {
+    if (!tabId) {
+        console.error("No tab ID in scriptDetected message");
+        return;
+    }
+
+    let content;
+    let sourceUrl = "url" in msg ? msg.url : msg.documentUrl;
+    if ("content" in msg) {
+        content = msg.content;
+    } else {
+        try {
+            console.log(`Secret Scanner: Fetching script ${msg.url}...`);
+            const response = await fetch(msg.url);
+            content = await response.text();
+        } catch (error) {
+            //TODO notify popup about errors and show
+            console.error(
+                "Secret Scanner: Failed to fetch script:",
+                msg.url,
+                error,
+            );
+        }
+    }
+    if (!content) {
+        return;
+    }
+    scanForSecrets(tabId, content, sourceUrl);
 }
 
 async function stopScanning(tabId: number): Promise<void> {

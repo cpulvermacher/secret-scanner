@@ -1,6 +1,6 @@
 import { defineConfig } from "vitest/config";
 
-const entryPoints = ["/background.ts"];
+const entryPoints = ["/background.ts", "/content-script.ts"];
 // get basename without extension
 const scriptNames = entryPoints.map(
     (path) => path.split("/").pop()?.split(".").shift() || "",
