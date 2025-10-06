@@ -111,65 +111,90 @@ function updateUI(): void {
 }
 
 function displayResults(results: SecretResult[]): void {
+    // Clear existing content
+    resultsList.replaceChildren();
+
     if (results.length === 0) {
-        resultsList.innerHTML =
-            '<div class="no-results">No secrets found</div>';
+        const noResults = document.createElement("div");
+        noResults.className = "no-results";
+        noResults.textContent = "No secrets found";
+        resultsList.appendChild(noResults);
         cautionText.className = "invisible";
 
         return;
     }
 
-    resultsList.innerHTML = results
-        .filter((secret) => filterWithReason(secret) === null)
-        .map(
-            (result: SecretResult) => `
-    <div class="result-item">
-      <div class="result-type">${escapeHtml(getTypeTitle(result.type))}</div>
-      <div class="result-match">${escapeHtml(result.match.substring(0, maxMatchLength))}${result.match.length > maxMatchLength ? "..." : ""}</div>
-      <div class="result-source">Source: ${formatSourceLink(result.source)}</div>
-    </div>
-  `,
-        )
-        .join("");
+    const filteredResults = results.filter(
+        (secret) => filterWithReason(secret) === null,
+    );
 
-    // Add click listeners to source links
-    const sourceLinks = resultsList.querySelectorAll(".source-link");
-    sourceLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
-            const url = (e.target as HTMLAnchorElement).href;
-            if (url && isValidUrl(url)) {
-                chrome.tabs.create({ url: `view-source:${url}` });
-            }
-        });
-    });
+    for (const result of filteredResults) {
+        const resultItem = document.createElement("div");
+        resultItem.className = "result-item";
+
+        const typeDiv = document.createElement("div");
+        typeDiv.className = "result-type";
+        typeDiv.textContent = getTypeTitle(result.type);
+        resultItem.appendChild(typeDiv);
+
+        const matchDiv = document.createElement("div");
+        matchDiv.className = "result-match";
+        matchDiv.textContent = truncateString(result.match, maxMatchLength);
+        resultItem.appendChild(matchDiv);
+
+        const sourceDiv = document.createElement("div");
+        sourceDiv.className = "result-source";
+        sourceDiv.textContent = "Source: ";
+
+        if (isValidUrl(result.source)) {
+            const link = document.createElement("a");
+            link.className = "source-link";
+            link.href = encodeURI(result.source);
+            link.textContent = truncateString(result.source, maxUrlLength);
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                const url = (e.target as HTMLAnchorElement).href;
+                if (url && isValidUrl(url)) {
+                    chrome.tabs.create({ url: `view-source:${url}` });
+                }
+            });
+            sourceDiv.appendChild(link);
+        } else {
+            sourceDiv.appendChild(document.createTextNode(result.source));
+        }
+
+        resultItem.appendChild(sourceDiv);
+        resultsList.appendChild(resultItem);
+    }
 
     cautionText.className = "";
 }
 
 function displayErrors(errors: ScriptFetchError[]) {
-    if (errors.length === 0) {
-        errorList.innerHTML = "";
-        return;
+    // Clear existing content
+    errorList.replaceChildren();
+
+    for (const error of errors) {
+        const resultItem = document.createElement("div");
+        resultItem.className = "result-item";
+
+        const typeDiv = document.createElement("div");
+        typeDiv.className = "result-type";
+        typeDiv.textContent = "Error";
+        resultItem.appendChild(typeDiv);
+
+        const matchDiv = document.createElement("div");
+        matchDiv.className = "result-match";
+        matchDiv.textContent = truncateString(error.error, maxErrorLength);
+        resultItem.appendChild(matchDiv);
+
+        const sourceDiv = document.createElement("div");
+        sourceDiv.className = "result-source";
+        sourceDiv.textContent = `Source: ${error.scriptUrl}`;
+        resultItem.appendChild(sourceDiv);
+
+        errorList.appendChild(resultItem);
     }
-
-    errorList.innerHTML = errors
-        .map(
-            (error) => `
-    <div class="result-item">
-      <div class="result-type">Error</div>
-      <div class="result-match">${escapeHtml(error.error.substring(0, maxErrorLength))}${error.error.length > maxErrorLength ? "..." : ""}</div>
-      <div class="result-source">Source: ${escapeHtml(error.scriptUrl)}</div>
-    </div>
-  `,
-        )
-        .join("");
-}
-
-function escapeHtml(text: string): string {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 function isValidUrl(string: string): boolean {
@@ -181,14 +206,8 @@ function isValidUrl(string: string): boolean {
     }
 }
 
-function formatSourceLink(source: string): string {
-    if (isValidUrl(source)) {
-        const displayedUrl =
-            source.substring(0, maxUrlLength) +
-            (source.length > maxUrlLength ? "..." : "");
-        return `<a class="source-link" href="${encodeURI(source)}">${escapeHtml(displayedUrl)}</a>`;
-    }
-    return escapeHtml(source);
+function truncateString(str: string, maxLength: number): string {
+    return str.substring(0, maxLength) + (str.length > maxLength ? "..." : "");
 }
 
 function getTypeTitle(type: SecretType): string {
