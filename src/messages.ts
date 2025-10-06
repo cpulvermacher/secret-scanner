@@ -1,3 +1,5 @@
+import type { SecretResult } from "./background";
+
 export type Message =
     | ScriptDetectedMessage
     | SecretsDetectedMessage
@@ -18,7 +20,13 @@ type ScriptSource =
 
 export type SecretsDetectedMessage = {
     type: "secretsDetected";
-    //TODO
+    results: SecretResult[];
+};
+
+export type ErrorWhenFetchingScriptMessage = {
+    type: "errorWhenFetchingScript";
+    scriptUrl: string;
+    error: string;
 };
 
 export type UserActionMessage = {

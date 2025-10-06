@@ -1,11 +1,22 @@
-import type { ScriptDetectedMessage, Message } from "./messages";
+import type {
+    ScriptDetectedMessage,
+    Message,
+    ErrorWhenFetchingScriptMessage,
+    SecretsDetectedMessage,
+} from "./messages";
 import { updateIcon } from "./icon";
 import { scan, type Secret } from "./scanner";
 
 interface TabData {
     isDebuggerActive: boolean;
     results: SecretResult[];
+    errors: ScriptFetchError[];
 }
+
+export type ScriptFetchError = {
+    scriptUrl: string;
+    error: string;
+};
 
 export interface SecretResult extends Secret {
     source: string; // source URL
@@ -20,6 +31,7 @@ function getOrCreateTabData(tabId: number): TabData {
         tabData = {
             isDebuggerActive: false,
             results: [],
+            errors: [],
         };
         tabs.set(tabId, tabData);
     }
@@ -161,6 +173,13 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
         }
     });
 
+    if (tabData.results.length > 0) {
+        chrome.runtime.sendMessage<SecretsDetectedMessage>({
+            type: "secretsDetected",
+            results: tabData.results,
+        });
+    }
+
     updateIcon(
         tabId,
         tabData.isDebuggerActive ? "active" : "inactive",
@@ -192,16 +211,18 @@ async function handleScriptDetectedMessage(
             const response = await fetch(msg.url);
             content = await response.text();
         } catch (error) {
-            //TODO notify popup about errors and show
-            console.error(
-                "Secret Scanner: Failed to fetch script:",
-                msg.url,
-                error,
-            );
+            const tabData = getOrCreateTabData(tabId);
+            tabData.errors.push({
+                scriptUrl: msg.url,
+                error: String(error),
+            });
+            chrome.runtime.sendMessage<ErrorWhenFetchingScriptMessage>({
+                type: "errorWhenFetchingScript",
+                scriptUrl: msg.url,
+                error: String(error),
+            });
+            return;
         }
-    }
-    if (!content) {
-        return;
     }
     scanForSecrets(tabId, content, sourceUrl);
 }
