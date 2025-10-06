@@ -33,19 +33,6 @@ body {
     margin-bottom: 16px;
 }
 
-.status-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-
-    &.active {
-        background-color: #22c55e;
-    }
-    &.inactive {
-        background-color: #ef4444;
-    }
-}
-
 button {
     padding: 8px 16px;
     border: none;

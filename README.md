@@ -6,22 +6,20 @@
 [![Status](https://flat.badgen.net/github/checks/cpulvermacher/secret-scanner)](https://github.com/cpulvermacher/secret-scanner/actions/workflows/node.js.yml)
 [![License](https://flat.badgen.net/github/license/cpulvermacher/secret-scanner)](./LICENSE)
 
-A proof-of-concept Chrome extension that scans JavaScript files loaded by websites for embedded secrets like private keys or passwords.
+A browser extension that scans JavaScript files loaded by websites for embedded secrets like private keys or passwords.
 
 ## Usage
 
-1. Navigate to a webpage you want to scan.
-2. Click the Secret Scanner extension icon in the toolbar.
-3. Click "Reload & Scan Page" to scan the page.
-4. Any detected secrets will appear in the popup.
-5. Click "Stop Scanning" when finished
+Pages are automatically scanned in the background, and the number of found secrets is shown in the extension icon in the toolbar. Click the extension icon to see details.
+
+Page security settings may prevent the extension from scanning some scripts. Optionally, you can click the extension icon and press "Enable Debugger & Reload". (only shown if needed)
 
 ## Limitations
 
-- Only scans the current tab when manually activated
-- Requires debugger permissions (shows "'Secret Scanner' started debugging this browser" banner)
 - Detected secrets may be false positives
 - May not catch dynamically constructed or obfuscated secrets
+- Scanning pages in the background does not read pages only referred to by other scripts. Use a full scan to scan all scripts.
+- Full scanning requires debugger permissions. (shows "'Secret Scanner' started debugging this browser" banner)
 
 ## Installation
 

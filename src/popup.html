@@ -11,11 +11,16 @@
         </div>
 
         <div class="status">
-            <div class="status-indicator" id="statusIndicator"></div>
-            <span id="statusText">Loading...</span>
+            <span id="loading">Loading...</span>
         </div>
 
-        <button id="toggleButton" disabled>Start Scanning</button>
+        <div class="debugger-status invisible" id="debuggerStatus">
+            <p>
+                Some scripts could not be analyzed. Enable the debugger to
+                analyze all scripts.
+            </p>
+            <button id="toggleButton">Enable Debugger</button>
+        </div>
 
         <div class="results">
             <div id="resultsList"></div>

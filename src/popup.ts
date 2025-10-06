@@ -6,14 +6,13 @@ import type { SecretType } from "./patterns";
 
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
+let errorsFound = false;
 let isDebuggerActive: boolean = false;
 checkStatus(currentTabId);
 
 // UI elements
-const statusIndicator = document.getElementById(
-    "statusIndicator",
-) as HTMLElement;
-const statusText = document.getElementById("statusText") as HTMLElement;
+const loading = document.getElementById("loading") as HTMLElement;
+const debuggerStatus = document.getElementById("debuggerStatus") as HTMLElement;
 const toggleButton = document.getElementById(
     "toggleButton",
 ) as HTMLButtonElement;
@@ -75,6 +74,8 @@ function checkStatus(tabId: number): void {
         },
         (tab: TabData) => {
             isDebuggerActive = tab.isDebuggerActive;
+            errorsFound = tab.errors.length > 0;
+
             updateUI();
             displayResults(tab);
         },
@@ -89,15 +90,14 @@ function pollForResults(): void {
 }
 
 function updateUI(): void {
-    toggleButton.disabled = false;
+    loading.className = "invisible";
+
     if (isDebuggerActive) {
-        statusIndicator.className = "status-indicator active";
-        statusText.textContent = "Scanning page for secrets...";
-        toggleButton.textContent = "Stop Scanning";
-    } else {
-        statusIndicator.className = "status-indicator inactive";
-        statusText.textContent = "Ready to scan";
-        toggleButton.textContent = "Reload & Scan Page";
+        debuggerStatus.className = "";
+        toggleButton.textContent = "Stop Debugger";
+    } else if ("debugger" in chrome && errorsFound) {
+        debuggerStatus.className = "";
+        toggleButton.textContent = "Enable Debugger & Reload";
     }
 }
 
