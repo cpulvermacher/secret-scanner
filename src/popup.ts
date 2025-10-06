@@ -1,7 +1,7 @@
-import type { SecretResult, TabData } from "./background";
+import type { ScriptFetchError, SecretResult, TabData } from "./background";
 import { getActiveTabId } from "./browser";
 import { filterWithReason } from "./filter";
-import type { UserActionMessage } from "./messages";
+import type { Message, UserActionMessage } from "./messages";
 import type { SecretType } from "./patterns";
 
 const maxMatchLength = 1000;
@@ -32,6 +32,17 @@ toggleButton.addEventListener("click", (): void => {
     }
 });
 
+chrome.runtime.onMessage.addListener((message: Message, sender): void => {
+    if (message.type === "secretsDetected" && sender.tab?.id === currentTabId) {
+        displayResults(message.results);
+    } else if (
+        message.type === "errorWhenFetchingScript" &&
+        sender.tab?.id === currentTabId
+    ) {
+        displayErrors(message.errors);
+    }
+});
+
 function startDebugger(tabId: number): void {
     // Start scanning first, then reload to catch all network requests
     chrome.runtime.sendMessage<UserActionMessage>(
@@ -45,7 +56,7 @@ function startDebugger(tabId: number): void {
                 isDebuggerActive = true;
                 updateUI();
 
-                pollForResults();
+                checkStatus(currentTabId);
 
                 chrome.tabs.reload(tabId);
             }
@@ -81,16 +92,10 @@ function checkStatus(tabId: number): void {
             errorsFound = tab.errors.length > 0;
 
             updateUI();
-            displayResults(tab);
+            displayResults(tab.results);
+            displayErrors(tab.errors);
         },
     );
-}
-
-function pollForResults(): void {
-    if (isDebuggerActive) {
-        checkStatus(currentTabId);
-        setTimeout(pollForResults, 1000);
-    }
 }
 
 function updateUI(): void {
@@ -105,17 +110,16 @@ function updateUI(): void {
     }
 }
 
-function displayResults(tab: TabData): void {
-    if (tab.results.length === 0) {
+function displayResults(results: SecretResult[]): void {
+    if (results.length === 0) {
         resultsList.innerHTML =
             '<div class="no-results">No secrets found</div>';
-        errorList.innerHTML = "";
         cautionText.className = "invisible";
 
         return;
     }
 
-    resultsList.innerHTML = tab.results
+    resultsList.innerHTML = results
         .filter((secret) => filterWithReason(secret) === null)
         .map(
             (result: SecretResult) => `
@@ -123,18 +127,6 @@ function displayResults(tab: TabData): void {
       <div class="result-type">${escapeHtml(getTypeTitle(result.type))}</div>
       <div class="result-match">${escapeHtml(result.match.substring(0, maxMatchLength))}${result.match.length > maxMatchLength ? "..." : ""}</div>
       <div class="result-source">Source: ${formatSourceLink(result.source)}</div>
-    </div>
-  `,
-        )
-        .join("");
-
-    errorList.innerHTML = tab.errors
-        .map(
-            (error) => `
-    <div class="result-item">
-      <div class="result-type">Error</div>
-      <div class="result-match">${escapeHtml(error.error.substring(0, maxErrorLength))}${error.error.length > maxErrorLength ? "..." : ""}</div>
-      <div class="result-source">Source: ${escapeHtml(error.scriptUrl)}</div>
     </div>
   `,
         )
@@ -153,6 +145,25 @@ function displayResults(tab: TabData): void {
     });
 
     cautionText.className = "";
+}
+
+function displayErrors(errors: ScriptFetchError[]) {
+    if (errors.length === 0) {
+        errorList.innerHTML = "";
+        return;
+    }
+
+    errorList.innerHTML = errors
+        .map(
+            (error) => `
+    <div class="result-item">
+      <div class="result-type">Error</div>
+      <div class="result-match">${escapeHtml(error.error.substring(0, maxErrorLength))}${error.error.length > maxErrorLength ? "..." : ""}</div>
+      <div class="result-source">Source: ${escapeHtml(error.scriptUrl)}</div>
+    </div>
+  `,
+        )
+        .join("");
 }
 
 function escapeHtml(text: string): string {

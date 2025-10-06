@@ -218,8 +218,7 @@ async function handleScriptDetectedMessage(
             });
             chrome.runtime.sendMessage<ErrorWhenFetchingScriptMessage>({
                 type: "errorWhenFetchingScript",
-                scriptUrl: msg.url,
-                error: String(error),
+                errors: tabData.errors,
             });
             return;
         }
