@@ -21,8 +21,14 @@ export type SecretsDetectedMessage = {
     //TODO
 };
 
-export interface UserActionMessage {
+export type UserActionMessage = {
     type: "userAction";
-    action: string;
+    action: UserAction;
     tabId: number;
-}
+};
+
+export type UserAction =
+    | "startDebugger"
+    | "stopDebugger"
+    | "getStatus"
+    | "getResults";

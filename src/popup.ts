@@ -1,13 +1,13 @@
 import type { SecretResult } from "./background";
 import { getActiveTabId } from "./browser";
 import { filterWithReason } from "./filter";
-import { updateIcon } from "./icon";
+import type { UserActionMessage } from "./messages";
 import type { SecretType } from "./patterns";
 
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
-let isScanning: boolean = false;
-checkScanningStatus(currentTabId);
+let isDebuggerActive: boolean = false;
+checkDebuggerStatus(currentTabId);
 loadResults(currentTabId);
 
 // UI elements
@@ -21,27 +21,26 @@ const toggleButton = document.getElementById(
 const resultsList = document.getElementById("resultsList") as HTMLElement;
 const cautionText = document.getElementById("caution") as HTMLElement;
 
-// Toggle scanning
 toggleButton.addEventListener("click", (): void => {
-    if (isScanning) {
-        stopScanning(currentTabId);
+    if (isDebuggerActive) {
+        stopDebugger(currentTabId);
     } else {
-        startScanning(currentTabId);
+        startDebugger(currentTabId);
     }
 });
 
-function startScanning(tabId: number): void {
+function startDebugger(tabId: number): void {
     // Start scanning first, then reload to catch all network requests
-    chrome.runtime.sendMessage(
+    chrome.runtime.sendMessage<UserActionMessage>(
         {
-            action: "startScanning",
+            type: "userAction",
+            action: "startDebugger",
             tabId,
         },
         (response: { status: string }) => {
             if (response.status === "started") {
-                isScanning = true;
+                isDebuggerActive = true;
                 updateUI();
-                updateIcon(tabId, "active");
 
                 // Poll for results every 2 seconds
                 pollForResults();
@@ -52,39 +51,40 @@ function startScanning(tabId: number): void {
     );
 }
 
-function stopScanning(tabId: number): void {
-    chrome.runtime.sendMessage(
+function stopDebugger(tabId: number): void {
+    chrome.runtime.sendMessage<UserActionMessage>(
         {
-            action: "stopScanning",
+            type: "userAction",
+            action: "stopDebugger",
             tabId,
         },
         (response: { status: string }) => {
             if (response.status === "stopped") {
-                isScanning = false;
+                isDebuggerActive = false;
                 updateUI();
-                updateIcon(tabId, "inactive");
             }
         },
     );
 }
 
-function checkScanningStatus(tabId: number): void {
-    chrome.runtime.sendMessage(
+function checkDebuggerStatus(tabId: number): void {
+    chrome.runtime.sendMessage<UserActionMessage>(
         {
+            type: "userAction",
             action: "getStatus",
             tabId,
         },
         (response: { isScanning?: boolean }) => {
-            isScanning = response?.isScanning || false;
+            isDebuggerActive = response?.isScanning || false;
             updateUI();
-            updateIcon(tabId, isScanning ? "active" : "inactive");
         },
     );
 }
 
 function loadResults(tabId: number): void {
-    chrome.runtime.sendMessage(
+    chrome.runtime.sendMessage<UserActionMessage>(
         {
+            type: "userAction",
             action: "getResults",
             tabId,
         },
@@ -97,7 +97,7 @@ function loadResults(tabId: number): void {
 }
 
 function pollForResults(): void {
-    if (isScanning) {
+    if (isDebuggerActive) {
         loadResults(currentTabId);
         setTimeout(pollForResults, 1000);
     }
@@ -105,7 +105,7 @@ function pollForResults(): void {
 
 function updateUI(): void {
     toggleButton.disabled = false;
-    if (isScanning) {
+    if (isDebuggerActive) {
         statusIndicator.className = "status-indicator active";
         statusText.textContent = "Scanning page for secrets...";
         toggleButton.textContent = "Stop Scanning";

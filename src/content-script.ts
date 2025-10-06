@@ -1,4 +1,4 @@
-import { ScriptDetectedMessage } from "./messages";
+import type { ScriptDetectedMessage } from "./messages";
 
 async function handleScript(script: HTMLScriptElement) {
     if (script.textContent) {
