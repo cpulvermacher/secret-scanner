@@ -195,6 +195,10 @@ async function handleScriptDetectedMessage(
         console.error("No tab ID in scriptDetected message");
         return;
     }
+    if (tabs.get(tabId)?.isDebuggerActive) {
+        // with debugger active, we catch scripts via the Debugger API
+        return;
+    }
     console.log(
         "Secret Scanner: Script detected in tab",
         tabId,
