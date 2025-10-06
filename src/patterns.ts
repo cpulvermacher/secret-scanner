@@ -22,6 +22,10 @@ const patterns = [
         pattern: /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g,
     },
     {
+        type: "googleApiKey",
+        pattern: /AIza[0-9A-Za-z\-_]{35}/g,
+    },
+    {
         type: "apiKey",
         pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{6,}['"]/gi,
         ignore: /['"]((\))?\.concat\(|.*api[_-]?key)/i,
