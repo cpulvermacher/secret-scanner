@@ -1,7 +1,8 @@
 # Change Log
 
-## [0.2.2]
+## [0.3.0]
 
+- Scan scripts in background, without explicitly activating extension
 - Filter more false positives
 
 ## [0.2.1]
