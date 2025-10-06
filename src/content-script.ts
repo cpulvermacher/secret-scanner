@@ -7,6 +7,7 @@ async function handleScript(script: HTMLScriptElement) {
             content: script.textContent,
             documentUrl: document.URL,
         };
+        // sendMessage() seems to have a length limit of around ~50MB
         await chrome.runtime.sendMessage(msg);
     } else if (script.src) {
         const msg: ScriptDetectedMessage = {
