@@ -1,11 +1,11 @@
+import { updateIcon } from "./icon";
 import type {
-    ScriptDetectedMessage,
-    Message,
     ErrorWhenFetchingScriptMessage,
+    Message,
+    ScriptDetectedMessage,
     SecretsDetectedMessage,
 } from "./messages";
-import { updateIcon } from "./icon";
-import { scan, type Secret } from "./scanner";
+import { type Secret, scan } from "./scanner";
 
 export type TabData = {
     isDebuggerActive: boolean;
@@ -216,10 +216,15 @@ async function handleScriptDetectedMessage(
             content = await response.text();
         } catch (error) {
             const tabData = getOrCreateTabData(tabId);
-            tabData.errors.push({
-                scriptUrl: msg.url,
-                error: String(error),
-            });
+            const isDuplicate = tabData.errors.some(
+                (e) => e.scriptUrl === msg.url
+            );
+            if (!isDuplicate) {
+                tabData.errors.push({
+                    scriptUrl: msg.url,
+                    error: String(error),
+                });
+            }
             chrome.runtime.sendMessage<ErrorWhenFetchingScriptMessage>({
                 type: "errorWhenFetchingScript",
                 errors: tabData.errors,
