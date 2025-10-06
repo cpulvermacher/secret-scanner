@@ -112,6 +112,17 @@ a {
     overflow-x: auto;
 }
 
+.error-list {
+    .result-item {
+        background-color: #fff2d1;
+        border: 1px solid #ffd466;
+    }
+
+    .result-type {
+        color: #b45309;
+    }
+}
+
 .no-results {
     text-align: center;
     color: #6b7280;

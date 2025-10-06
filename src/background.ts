@@ -7,11 +7,11 @@ import type {
 import { updateIcon } from "./icon";
 import { scan, type Secret } from "./scanner";
 
-interface TabData {
+export type TabData = {
     isDebuggerActive: boolean;
     results: SecretResult[];
     errors: ScriptFetchError[];
-}
+};
 
 export type ScriptFetchError = {
     scriptUrl: string;
@@ -66,13 +66,13 @@ chrome.runtime.onMessage.addListener(
                         sendResponse({ status: "error", error });
                     });
                 return true; // Keep message channel open for async response
-            } else if (message.action === "getResults") {
-                const results = tabs.get(message.tabId)?.results || [];
-                sendResponse({ results });
             } else if (message.action === "getStatus") {
-                const tabData = tabs.get(message.tabId);
-                const isDebuggerActive = tabData?.isDebuggerActive || false;
-                sendResponse({ isDebuggerActive });
+                const tabData: TabData = tabs.get(message.tabId) ?? {
+                    isDebuggerActive: false,
+                    results: [],
+                    errors: [],
+                };
+                sendResponse(tabData);
             }
         }
     },

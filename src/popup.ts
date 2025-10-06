@@ -1,4 +1,4 @@
-import type { SecretResult } from "./background";
+import type { SecretResult, TabData } from "./background";
 import { getActiveTabId } from "./browser";
 import { filterWithReason } from "./filter";
 import type { UserActionMessage } from "./messages";
@@ -7,8 +7,7 @@ import type { SecretType } from "./patterns";
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
 let isDebuggerActive: boolean = false;
-checkDebuggerStatus(currentTabId);
-loadResults(currentTabId);
+checkStatus(currentTabId);
 
 // UI elements
 const statusIndicator = document.getElementById(
@@ -19,6 +18,7 @@ const toggleButton = document.getElementById(
     "toggleButton",
 ) as HTMLButtonElement;
 const resultsList = document.getElementById("resultsList") as HTMLElement;
+const errorList = document.getElementById("errorList") as HTMLElement;
 const cautionText = document.getElementById("caution") as HTMLElement;
 
 toggleButton.addEventListener("click", (): void => {
@@ -42,7 +42,6 @@ function startDebugger(tabId: number): void {
                 isDebuggerActive = true;
                 updateUI();
 
-                // Poll for results every 2 seconds
                 pollForResults();
 
                 chrome.tabs.reload(tabId);
@@ -67,38 +66,24 @@ function stopDebugger(tabId: number): void {
     );
 }
 
-function checkDebuggerStatus(tabId: number): void {
+function checkStatus(tabId: number): void {
     chrome.runtime.sendMessage<UserActionMessage>(
         {
             type: "userAction",
             action: "getStatus",
             tabId,
         },
-        (response: { isScanning?: boolean }) => {
-            isDebuggerActive = response?.isScanning || false;
+        (tab: TabData) => {
+            isDebuggerActive = tab.isDebuggerActive;
             updateUI();
-        },
-    );
-}
-
-function loadResults(tabId: number): void {
-    chrome.runtime.sendMessage<UserActionMessage>(
-        {
-            type: "userAction",
-            action: "getResults",
-            tabId,
-        },
-        (response: { results?: SecretResult[] }) => {
-            if (response?.results) {
-                displayResults(response.results);
-            }
+            displayResults(tab);
         },
     );
 }
 
 function pollForResults(): void {
     if (isDebuggerActive) {
-        loadResults(currentTabId);
+        checkStatus(currentTabId);
         setTimeout(pollForResults, 1000);
     }
 }
@@ -116,17 +101,18 @@ function updateUI(): void {
     }
 }
 
-function displayResults(results: SecretResult[]): void {
-    if (results.length === 0) {
+function displayResults(tab: TabData): void {
+    if (tab.results.length === 0) {
         resultsList.innerHTML =
             '<div class="no-results">No secrets found</div>';
+        errorList.innerHTML = "";
         cautionText.className = "invisible";
 
         return;
     }
 
     const maxMatchLength = 1000;
-    resultsList.innerHTML = results
+    resultsList.innerHTML = tab.results
         .filter((secret) => filterWithReason(secret) === null)
         .map(
             (result: SecretResult) => `
@@ -134,6 +120,19 @@ function displayResults(results: SecretResult[]): void {
       <div class="result-type">${escapeHtml(getTypeTitle(result.type))}</div>
       <div class="result-match">${escapeHtml(result.match.substring(0, maxMatchLength))}${result.match.length > maxMatchLength ? "..." : ""}</div>
       <div class="result-source">Source: ${formatSourceLink(result.source)}</div>
+    </div>
+  `,
+        )
+        .join("");
+
+    const maxErrorLength = 200;
+    errorList.innerHTML = tab.errors
+        .map(
+            (error) => `
+    <div class="result-item">
+      <div class="result-type">Error</div>
+      <div class="result-match">${escapeHtml(error.error.substring(0, maxErrorLength))}${error.error.length > maxErrorLength ? "..." : ""}</div>
+      <div class="result-source">Source: ${escapeHtml(error.scriptUrl)}</div>
     </div>
   `,
         )

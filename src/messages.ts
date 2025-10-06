@@ -35,8 +35,4 @@ export type UserActionMessage = {
     tabId: number;
 };
 
-export type UserAction =
-    | "startDebugger"
-    | "stopDebugger"
-    | "getStatus"
-    | "getResults";
+export type UserAction = "startDebugger" | "stopDebugger" | "getStatus";
