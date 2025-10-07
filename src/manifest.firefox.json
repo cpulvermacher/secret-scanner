@@ -1,0 +1,15 @@
+{
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "@secret-scanner",
+            "strict_min_version": "140.0"
+        },
+        "gecko_android": {
+            "id": "@secret-scanner",
+            "strict_min_version": "140.0"
+        }
+    },
+    "action": {
+        "default_area": "navbar"
+    }
+}

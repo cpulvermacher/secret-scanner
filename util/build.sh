@@ -37,6 +37,15 @@ cat src/manifest.json |
     sed "s/__VERSION__/$VERSION/g" \
         >dist/chrome/manifest.json
 
+### Create Firefox version using Chrome as base ###
+
+mkdir -p dist/firefox
+cp -r dist/chrome/* dist/firefox/
+cat dist/chrome/manifest.json |
+    jq '.background.scripts = [.background.service_worker] | del(.background.service_worker) | del(.version_name) ' |
+    jq '. * input' - "src/manifest.firefox.json" \
+        >dist/firefox/manifest.json
+
 create_zip() {
     ZIP_PATH="$1"
     TARGET_DIR="$2"
@@ -52,7 +61,7 @@ create_zip() {
 
 if [ "$MODE" = "production" ]; then
     create_zip "$PWD/$APP_NAME-$LONG_VERSION-chrome.zip" dist/chrome
-    # create_zip "$PWD/$APP_NAME-$LONG_VERSION-firefox.zip" dist/firefox
+    create_zip "$PWD/$APP_NAME-$LONG_VERSION-firefox.zip" dist/firefox
 
     # create a source code bundle by cloning the repo and zipping it
     TMP_DIR=$(mktemp -d)
