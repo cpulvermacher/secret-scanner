@@ -23,17 +23,32 @@ export type SecretResult = Secret & {
     timestamp: string;
 };
 
-const tabs = new Map<number, TabData>(); // Track status per tab
+// Use chrome.storage.session to persist state across service worker restarts
+async function getTabData(tabId: number): Promise<TabData | undefined> {
+    const key = `tab_${tabId}`;
+    const result = await chrome.storage.session.get(key);
+    return result[key];
+}
 
-function getOrCreateTabData(tabId: number): TabData {
-    let tabData = tabs.get(tabId);
+async function setTabData(tabId: number, data: TabData): Promise<void> {
+    const key = `tab_${tabId}`;
+    await chrome.storage.session.set({ [key]: data });
+}
+
+async function deleteTabData(tabId: number): Promise<void> {
+    const key = `tab_${tabId}`;
+    await chrome.storage.session.remove(key);
+}
+
+async function getOrCreateTabData(tabId: number): Promise<TabData> {
+    let tabData = await getTabData(tabId);
     if (!tabData) {
         tabData = {
             isDebuggerActive: false,
             results: [],
             errors: [],
         };
-        tabs.set(tabId, tabData);
+        await setTabData(tabId, tabData);
     }
     return tabData;
 }
@@ -67,19 +82,26 @@ chrome.runtime.onMessage.addListener(
                     });
                 return true; // Keep message channel open for async response
             } else if (message.action === "getStatus") {
-                const tabData: TabData = tabs.get(message.tabId) ?? {
-                    isDebuggerActive: false,
-                    results: [],
-                    errors: [],
-                };
-                sendResponse(tabData);
+                getTabData(message.tabId)
+                    .then((tabData) => {
+                        const response: TabData = tabData ?? {
+                            isDebuggerActive: false,
+                            results: [],
+                            errors: [],
+                        };
+                        sendResponse(response);
+                    })
+                    .catch((error: Error) => {
+                        sendResponse({ status: "error", error });
+                    });
+                return true; // Keep message channel open for async response
             }
         }
     },
 );
 
 async function startDebugger(tabId: number): Promise<void> {
-    const tabData = getOrCreateTabData(tabId);
+    const tabData = await getOrCreateTabData(tabId);
 
     updateIcon(tabId, "active", tabData.results.length);
 
@@ -88,7 +110,7 @@ async function startDebugger(tabId: number): Promise<void> {
 
     // Initialize tab tracking
     tabData.isDebuggerActive = true;
-    tabs.set(tabId, tabData);
+    await setTabData(tabId, tabData);
 
     // Enable Debugger domain to catch script parsing
     await chrome.debugger.sendCommand({ tabId }, "Debugger.enable");
@@ -105,8 +127,10 @@ if (!chrome.debugger.onEvent.hasListener(handleDebuggerEvent)) {
 chrome.debugger.onDetach.addListener((source) => {
     const tabId = source.tabId;
     if (tabId !== undefined) {
-        const count = tabs.get(tabId)?.results.length || 0;
-        updateIcon(tabId, "inactive", count);
+        void getTabData(tabId).then((tabData) => {
+            const count = tabData?.results.length || 0;
+            updateIcon(tabId, "inactive", count);
+        });
     }
 });
 
@@ -116,10 +140,10 @@ function handleDebuggerEvent(
     params?: object,
 ): void {
     const tabId = source.tabId;
-    if (!tabId || !tabs.has(tabId)) return;
+    if (!tabId) return;
 
     if (method === "Debugger.scriptParsed") {
-        handleScriptParsed(tabId, params as ScriptParsedParams);
+        void handleScriptParsed(tabId, params as ScriptParsedParams);
     }
 }
 
@@ -131,7 +155,7 @@ async function handleScriptParsed(
     tabId: number,
     params?: ScriptParsedParams,
 ): Promise<void> {
-    const tabData = tabs.get(tabId);
+    const tabData = await getTabData(tabId);
     if (!tabData?.isDebuggerActive) return;
 
     try {
@@ -143,7 +167,7 @@ async function handleScriptParsed(
         )) as { scriptSource?: string };
 
         if (result?.scriptSource) {
-            scanForSecrets(
+            await scanForSecrets(
                 tabId,
                 result.scriptSource,
                 params?.url || "inline script",
@@ -154,8 +178,12 @@ async function handleScriptParsed(
     }
 }
 
-function scanForSecrets(tabId: number, content: string, source: string): void {
-    const tabData = getOrCreateTabData(tabId);
+async function scanForSecrets(
+    tabId: number,
+    content: string,
+    source: string,
+): Promise<void> {
+    const tabData = await getOrCreateTabData(tabId);
 
     const results = scan(content);
     results.forEach((result) => {
@@ -172,6 +200,8 @@ function scanForSecrets(tabId: number, content: string, source: string): void {
             });
         }
     });
+
+    await setTabData(tabId, tabData);
 
     if (tabData.results.length > 0) {
         chrome.runtime.sendMessage<SecretsDetectedMessage>({
@@ -195,7 +225,8 @@ async function handleScriptDetectedMessage(
         console.error("No tab ID in scriptDetected message");
         return;
     }
-    if (tabs.get(tabId)?.isDebuggerActive) {
+    const tabData = await getTabData(tabId);
+    if (tabData?.isDebuggerActive) {
         // with debugger active, we catch scripts via the Debugger API
         return;
     }
@@ -215,29 +246,32 @@ async function handleScriptDetectedMessage(
             const response = await fetch(msg.url);
             content = await response.text();
         } catch (error) {
-            const tabData = getOrCreateTabData(tabId);
-            const isDuplicate = tabData.errors.some(
-                (e) => e.scriptUrl === msg.url
+            const errorTabData = await getOrCreateTabData(tabId);
+            const isDuplicate = errorTabData.errors.some(
+                (e) => e.scriptUrl === msg.url,
             );
             if (!isDuplicate) {
-                tabData.errors.push({
+                errorTabData.errors.push({
                     scriptUrl: msg.url,
                     error: String(error),
                 });
+                await setTabData(tabId, errorTabData);
             }
             chrome.runtime.sendMessage<ErrorWhenFetchingScriptMessage>({
                 type: "errorWhenFetchingScript",
-                errors: tabData.errors,
+                errors: errorTabData.errors,
             });
             return;
         }
     }
-    scanForSecrets(tabId, content, sourceUrl);
+    await scanForSecrets(tabId, content, sourceUrl);
 }
 
 async function stopDebugger(tabId: number): Promise<void> {
-    const tabData = getOrCreateTabData(tabId);
+    const tabData = await getOrCreateTabData(tabId);
     tabData.isDebuggerActive = false;
+    await setTabData(tabId, tabData);
+
     if (tabData.results.length === 0) {
         // Clear badge if no secrets were found
         chrome.action.setBadgeText({ text: "", tabId });
@@ -248,13 +282,14 @@ async function stopDebugger(tabId: number): Promise<void> {
 }
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-    const tabData = tabs.get(activeInfo.tabId);
-    const count = tabData?.results.length ?? 0;
-    updateIcon(
-        activeInfo.tabId,
-        tabData?.isDebuggerActive ? "active" : "inactive",
-        count,
-    );
+    void getTabData(activeInfo.tabId).then((tabData) => {
+        const count = tabData?.results.length ?? 0;
+        updateIcon(
+            activeInfo.tabId,
+            tabData?.isDebuggerActive ? "active" : "inactive",
+            count,
+        );
+    });
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
@@ -262,21 +297,24 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
         return; // url unchanged, nothing to do
     }
 
-    const tabData = tabs.get(tabId);
-    if (tabData) {
-        const count = tabData.results.length;
-        void updateIcon(tabId, "active", count);
-    } else {
-        void updateIcon(tabId, "inactive", 0);
-    }
+    void getTabData(tabId).then((tabData) => {
+        if (tabData) {
+            const count = tabData.results.length;
+            void updateIcon(tabId, "active", count);
+        } else {
+            void updateIcon(tabId, "inactive", 0);
+        }
+    });
 });
 
 chrome.tabs.onRemoved.addListener((tabId: number) => {
-    const tabData = tabs.get(tabId);
-    if (tabData) {
-        tabs.delete(tabId);
-    }
-    if (tabData?.isDebuggerActive) {
-        void stopDebugger(tabId);
-    }
+    void getTabData(tabId).then((tabData) => {
+        if (tabData) {
+            console.log("Secret Scanner: Tab closed, cleaning up", tabId);
+            void deleteTabData(tabId);
+        }
+        if (tabData?.isDebuggerActive) {
+            void stopDebugger(tabId);
+        }
+    });
 });
