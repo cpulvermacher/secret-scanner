@@ -220,6 +220,8 @@ function getTypeTitle(type: SecretType): string {
             return "Slack Bot Token";
         case "googleApiKey":
             return "Google API Key";
+        case "openAIApiKey":
+            return "OpenAI API Key";
         case "apiKey":
             return "API Key";
         case "password":

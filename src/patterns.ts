@@ -26,6 +26,10 @@ const patterns = [
         pattern: /AIza[0-9A-Za-z\-_]{35}/g,
     },
     {
+        type: "openAIApiKey",
+        pattern: /sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}/,
+    },
+    {
         type: "apiKey",
         pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{6,}['"]/gi,
         ignore: /['"]((\))?\.concat\(|.*api[_-]?key)/i,
