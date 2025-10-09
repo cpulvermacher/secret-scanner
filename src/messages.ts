@@ -21,11 +21,13 @@ type ScriptSource =
 
 export type SecretsDetectedMessage = {
     type: "secretsDetected";
+    tabId: number;
     results: SecretResult[];
 };
 
 export type ErrorWhenFetchingScriptMessage = {
     type: "errorWhenFetchingScript";
+    tabId: number;
     errors: ScriptFetchError[];
 };
 

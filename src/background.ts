@@ -206,6 +206,7 @@ async function scanForSecrets(
     if (tabData.results.length > 0) {
         chrome.runtime.sendMessage<SecretsDetectedMessage>({
             type: "secretsDetected",
+            tabId,
             results: tabData.results,
         });
     }
@@ -259,6 +260,7 @@ async function handleScriptDetectedMessage(
             }
             chrome.runtime.sendMessage<ErrorWhenFetchingScriptMessage>({
                 type: "errorWhenFetchingScript",
+                tabId,
                 errors: errorTabData.errors,
             });
             return;

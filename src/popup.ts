@@ -32,12 +32,12 @@ toggleButton.addEventListener("click", (): void => {
     }
 });
 
-chrome.runtime.onMessage.addListener((message: Message, sender): void => {
-    if (message.type === "secretsDetected" && sender.tab?.id === currentTabId) {
+chrome.runtime.onMessage.addListener((message: Message): void => {
+    if (message.type === "secretsDetected" && message.tabId === currentTabId) {
         displayResults(message.results);
     } else if (
         message.type === "errorWhenFetchingScript" &&
-        sender.tab?.id === currentTabId
+        message.tabId === currentTabId
     ) {
         displayErrors(message.errors);
     }
