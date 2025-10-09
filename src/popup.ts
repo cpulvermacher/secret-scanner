@@ -43,59 +43,56 @@ chrome.runtime.onMessage.addListener((message: Message): void => {
     }
 });
 
-function startDebugger(tabId: number): void {
+async function startDebugger(tabId: number) {
     // Start scanning first, then reload to catch all network requests
-    chrome.runtime.sendMessage<UserActionMessage>(
-        {
-            type: "userAction",
-            action: "startDebugger",
-            tabId,
-        },
-        (response: { status: string }) => {
-            if (response.status === "started") {
-                isDebuggerActive = true;
-                updateUI();
+    const response = await chrome.runtime.sendMessage<
+        UserActionMessage,
+        { status: string }
+    >({
+        type: "userAction",
+        action: "startDebugger",
+        tabId,
+    });
 
-                checkStatus(currentTabId);
+    if (response.status === "started") {
+        isDebuggerActive = true;
+        updateUI();
 
-                chrome.tabs.reload(tabId);
-            }
-        },
-    );
+        checkStatus(currentTabId);
+
+        chrome.tabs.reload(tabId);
+    }
 }
 
-function stopDebugger(tabId: number): void {
-    chrome.runtime.sendMessage<UserActionMessage>(
-        {
-            type: "userAction",
-            action: "stopDebugger",
-            tabId,
-        },
-        (response: { status: string }) => {
-            if (response.status === "stopped") {
-                isDebuggerActive = false;
-                updateUI();
-            }
-        },
-    );
+async function stopDebugger(tabId: number) {
+    const response = await chrome.runtime.sendMessage<
+        UserActionMessage,
+        { status: string }
+    >({
+        type: "userAction",
+        action: "stopDebugger",
+        tabId,
+    });
+
+    if (response.status === "stopped") {
+        isDebuggerActive = false;
+        updateUI();
+    }
 }
 
-function checkStatus(tabId: number): void {
-    chrome.runtime.sendMessage<UserActionMessage>(
-        {
-            type: "userAction",
-            action: "getStatus",
-            tabId,
-        },
-        (tab: TabData) => {
-            isDebuggerActive = tab.isDebuggerActive;
-            errorsFound = tab.errors.length > 0;
+async function checkStatus(tabId: number) {
+    const tab = await chrome.runtime.sendMessage<UserActionMessage, TabData>({
+        type: "userAction",
+        action: "getStatus",
+        tabId,
+    });
 
-            updateUI();
-            displayResults(tab.results);
-            displayErrors(tab.errors);
-        },
-    );
+    isDebuggerActive = tab.isDebuggerActive;
+    errorsFound = tab.errors.length > 0;
+
+    updateUI();
+    displayResults(tab.results);
+    displayErrors(tab.errors);
 }
 
 function updateUI(): void {
