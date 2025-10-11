@@ -1,26 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <title>Secret Scanner Test Page</title>
-</head>
-<body>
-    <h1>Test Page for Secret Detection</h1>
-    <p>This page loads JavaScript with embedded secrets for testing.</p>
+    <head>
+        <title>Secret Scanner Test Page</title>
+        <style>
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, Inter, Helvetica, Arial,
+                    "Liberation Sans", sans-serif;
+                background-color: #ffffff;
+                color: #555555;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Test Page for Secret Detection</h1>
+        <p>Expected number of secrets: 5</p>
 
-    <script>
-        // Inline script with a fake private key
-        const fakePrivateKey = `-----BEGIN PRIVATE KEY-----
+        <script>
+            // Inline script with a fake private key
+            const fakePrivateKey = `-----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7VJTUt9Us8cKB
 wjXVn7peBJQltcVHHh16JEK5OZrqBKNHdIHjwEdSHo4cCbp7y0GBFVB9XPZlWf5T
 vWN4r1ZQRhVfhUB8eOKaOsAT1oWIJzNzNqmyFU9gTJMwNdOdC3F+5MRbVzw8cQmG
 -----END PRIVATE KEY-----`;
 
-        // Another fake secret pattern
-        const stripeKey = "sk_live_1234567890123456789012345678901234567890";
+            // Another fake secret pattern
+            const stripeKey =
+                "sk_live_1234567890123456789012345678901234567890";
 
-        console.log("Test secrets loaded in inline script");
-    </script>
+            console.log("Test secrets loaded in inline script");
+        </script>
 
-    <script src="external-test.js"></script>
-</body>
+        <script src="external-test.js"></script>
+    </body>
 </html>
