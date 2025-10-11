@@ -129,19 +129,24 @@ async function startDebugger(tabId: number): Promise<void> {
 }
 
 // Global event listener (only set up once)
-if (!chrome.debugger.onEvent.hasListener(handleDebuggerEvent)) {
+if (
+    "debugger" in chrome &&
+    !chrome.debugger.onEvent.hasListener(handleDebuggerEvent)
+) {
     chrome.debugger.onEvent.addListener(handleDebuggerEvent);
 }
 
-chrome.debugger.onDetach.addListener((source) => {
-    const tabId = source.tabId;
-    if (tabId !== undefined) {
-        void getTabData(tabId).then((tabData) => {
-            const count = tabData?.results.length || 0;
-            updateIcon(tabId, "inactive", count);
-        });
-    }
-});
+if ("debugger" in chrome) {
+    chrome.debugger.onDetach.addListener((source) => {
+        const tabId = source.tabId;
+        if (tabId !== undefined) {
+            void getTabData(tabId).then((tabData) => {
+                const count = tabData?.results.length || 0;
+                updateIcon(tabId, "inactive", count);
+            });
+        }
+    });
+}
 
 function handleDebuggerEvent(
     source: chrome.debugger.Debuggee,
