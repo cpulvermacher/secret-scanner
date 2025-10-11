@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.4.0]
+
+- Fix tab state being lost
+- Add support for Firefox
+- Detect Anthropic, OpenAI API keys, AWS access keys and GitHub tokens
+
 ## [0.3.0]
 
 - Scan scripts in background, without explicitly activating extension
