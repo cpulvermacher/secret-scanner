@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { scan } from "../scanner";
+import { scan } from "../../secrets/scanner";
 
 describe("scan", () => {
     it("should return empty array for content with no secrets", () => {

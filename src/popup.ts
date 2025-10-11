@@ -1,7 +1,7 @@
 import type { ScriptFetchError, SecretResult, TabData } from "./background";
-import { getActiveTabId } from "./browser";
-import { filterWithReason } from "./filter";
-import type { UserActionMessage } from "./messages";
+import { getActiveTabId } from "./util/browser";
+import { filterWithReason } from "./util/filter";
+import type { UserActionMessage } from "./util/messages";
 
 const maxMatchLength = 1000;
 const maxErrorLength = 200;

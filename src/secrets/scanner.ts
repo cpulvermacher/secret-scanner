@@ -1,4 +1,4 @@
-import { secretPatterns, type SecretType } from "./patterns";
+import { type SecretType, secretPatterns } from "./patterns";
 
 export type Secret = {
     type: SecretType;

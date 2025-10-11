@@ -1,6 +1,6 @@
-import { updateIcon } from "./icon";
-import type { Message, ScriptDetectedMessage } from "./messages";
-import { type Secret, scan } from "./scanner";
+import { type Secret, scan } from "./secrets/scanner";
+import { updateIcon } from "./util/icon";
+import type { Message, ScriptDetectedMessage } from "./util/messages";
 
 export type TabData = {
     isDebuggerActive: boolean;
