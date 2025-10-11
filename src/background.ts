@@ -210,10 +210,6 @@ async function scanForSecrets(
             }
         });
 
-        if (tabData.results.length > 0) {
-            console.log("secrets detected", tabId, tabData.results.length);
-        }
-
         updateIcon(
             tabId,
             tabData.isDebuggerActive ? "active" : "inactive",
@@ -236,11 +232,6 @@ async function handleScriptDetectedMessage(
         // with debugger active, we catch scripts via the Debugger API
         return;
     }
-    console.log(
-        "Secret Scanner: Script detected in tab",
-        tabId,
-        msg.documentUrl,
-    );
 
     let content: string | undefined;
     const sourceUrl = "url" in msg ? msg.url : msg.documentUrl;
