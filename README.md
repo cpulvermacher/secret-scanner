@@ -18,8 +18,8 @@ Page security settings may prevent the extension from scanning some scripts. Opt
 
 - Detected secrets may be false positives
 - May not catch dynamically constructed or obfuscated secrets
-- Scanning pages in the background does not read pages only referred to by other scripts. Use a full scan to scan all scripts.
-- Full scanning requires debugger permissions. (shows "'Secret Scanner' started debugging this browser" banner)
+- Scanning pages in the background does not read pages only referred to by other scripts.
+- (Only available on Chrome) Full scanning requires debugger permissions. (shows "'Secret Scanner' started debugging this browser" banner)
 
 ## Installation
 
