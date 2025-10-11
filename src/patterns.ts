@@ -26,8 +26,12 @@ const patterns = [
         pattern: /AIza[0-9A-Za-z\-_]{35}/g,
     },
     {
+        type: "anthropicApiKey",
+        pattern: /sk-ant-api[0-9]{2}-[a-zA-Z0-9_-]{94}/g,
+    },
+    {
         type: "openAIApiKey",
-        pattern: /sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}/,
+        pattern: /sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}/g,
     },
     {
         type: "apiKey",
