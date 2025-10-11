@@ -1,4 +1,4 @@
-import type { ScriptFetchError, SecretResult, TabData } from "./background";
+import type { ScriptFetchError, SecretResult, TabData } from "./util/tabdata";
 import { getActiveTabId } from "./util/browser";
 import { filterWithReason } from "./util/filter";
 import type { UserActionMessage } from "./util/messages";
@@ -9,7 +9,6 @@ const maxUrlLength = 200;
 
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
-const tabKey = `tab_${currentTabId}`;
 let errorsFound = false;
 let isDebuggerActive: boolean = false;
 checkStatus(currentTabId);
@@ -33,6 +32,7 @@ toggleButton.addEventListener("click", (): void => {
 });
 
 chrome.storage.session.onChanged.addListener((changes) => {
+    const tabKey = `tab_${currentTabId}`;
     if (changes[tabKey]) {
         const tabData: TabData = changes[tabKey].newValue;
 
