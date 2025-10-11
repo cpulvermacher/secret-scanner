@@ -1,5 +1,6 @@
 import { type Secret, scan } from "./secrets/scanner";
 import { updateIcon } from "./util/icon";
+import { debugLog } from "./util/log";
 import type { Message, ScriptDetectedMessage } from "./util/messages";
 
 export type TabData = {
@@ -244,7 +245,7 @@ async function handleScriptDetectedMessage(
         content = msg.content;
     } else {
         try {
-            console.log(`Secret Scanner: Fetching script ${msg.url}...`);
+            debugLog(`Secret Scanner: Fetching script ${msg.url}...`);
             const response = await fetch(msg.url);
             content = await response.text();
         } catch (error) {
@@ -308,7 +309,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 chrome.tabs.onRemoved.addListener((tabId: number) => {
     void getTabData(tabId).then((tabData) => {
         if (tabData) {
-            console.log("Secret Scanner: Tab closed, cleaning up", tabId);
+            debugLog("Secret Scanner: Tab closed, cleaning up", tabId);
             void deleteTabData(tabId);
         }
         if (tabData?.isDebuggerActive) {

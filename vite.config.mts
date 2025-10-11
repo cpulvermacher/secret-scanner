@@ -5,13 +5,10 @@ const entryPoints = ["/background.ts", "/content-script.ts"];
 const scriptNames = entryPoints.map(
     (path) => path.split("/").pop()?.split(".").shift() || "",
 );
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
     root: "src",
     test: {
         root: "src/test",
-    },
-    esbuild: {
-        pure: mode === "production" ? ["console.log"] : [],
     },
     build: {
         outDir: "../dist/chrome",
