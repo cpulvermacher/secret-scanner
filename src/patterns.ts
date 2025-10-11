@@ -22,6 +22,10 @@ const patterns = [
         pattern: /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g,
     },
     {
+        type: "awsAccessKey",
+        pattern: /(?:A3T[A-Z0-9]|AKIA|ASIA|ABIA|ACCA)[A-Z2-7]{16}/g,
+    },
+    {
         type: "googleApiKey",
         pattern: /AIza[0-9A-Za-z\-_]{35}/g,
     },
