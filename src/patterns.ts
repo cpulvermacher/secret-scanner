@@ -38,6 +38,14 @@ const patterns = [
         pattern: /sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}/g,
     },
     {
+        type: "githubToken",
+        pattern: /(?:ghu|ghs|ghp|gho)_[0-9a-zA-Z]{36}/g,
+    },
+    {
+        type: "githubFineGrainedToken",
+        pattern: /github_pat_\w{82}/g,
+    },
+    {
         type: "apiKey",
         pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{6,}['"]/gi,
         ignore: /['"]((\))?\.concat\(|.*api[_-]?key)/i,

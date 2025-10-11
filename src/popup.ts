@@ -222,6 +222,10 @@ function getTypeTitle(type: SecretType): string {
             return "Anthropic API Key";
         case "openAIApiKey":
             return "OpenAI API Key";
+        case "githubToken":
+            return "GitHub Token";
+        case "githubFineGrainedToken":
+            return "GitHub Fine-Grained PAT";
         case "apiKey":
             return "API Key";
         case "password":
