@@ -1,10 +1,5 @@
 import { updateIcon } from "./icon";
-import type {
-    ErrorWhenFetchingScriptMessage,
-    Message,
-    ScriptDetectedMessage,
-    SecretsDetectedMessage,
-} from "./messages";
+import type { Message, ScriptDetectedMessage } from "./messages";
 import { type Secret, scan } from "./scanner";
 
 export type TabData = {
@@ -217,11 +212,6 @@ async function scanForSecrets(
 
         if (tabData.results.length > 0) {
             console.log("secrets detected", tabId, tabData.results.length);
-            chrome.runtime.sendMessage<SecretsDetectedMessage>({
-                type: "secretsDetected",
-                tabId,
-                results: tabData.results,
-            });
         }
 
         updateIcon(
@@ -272,11 +262,6 @@ async function handleScriptDetectedMessage(
                         error: String(error),
                     });
                 }
-                chrome.runtime.sendMessage<ErrorWhenFetchingScriptMessage>({
-                    type: "errorWhenFetchingScript",
-                    tabId,
-                    errors: errorTabData.errors,
-                });
             });
             return;
         }

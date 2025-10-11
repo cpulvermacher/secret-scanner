@@ -1,10 +1,4 @@
-import type { ScriptFetchError, SecretResult } from "./background";
-
-export type Message =
-    | ScriptDetectedMessage
-    | SecretsDetectedMessage
-    | ErrorWhenFetchingScriptMessage
-    | UserActionMessage;
+export type Message = ScriptDetectedMessage | UserActionMessage;
 
 export type ScriptDetectedMessage = {
     type: "scriptDetected";
@@ -18,18 +12,6 @@ type ScriptSource =
     | {
           content: string;
       };
-
-export type SecretsDetectedMessage = {
-    type: "secretsDetected";
-    tabId: number;
-    results: SecretResult[];
-};
-
-export type ErrorWhenFetchingScriptMessage = {
-    type: "errorWhenFetchingScript";
-    tabId: number;
-    errors: ScriptFetchError[];
-};
 
 export type UserActionMessage = {
     type: "userAction";

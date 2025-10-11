@@ -1,7 +1,7 @@
 import type { ScriptFetchError, SecretResult, TabData } from "./background";
 import { getActiveTabId } from "./browser";
 import { filterWithReason } from "./filter";
-import type { Message, UserActionMessage } from "./messages";
+import type { UserActionMessage } from "./messages";
 import type { SecretType } from "./patterns";
 
 const maxMatchLength = 1000;
@@ -10,6 +10,7 @@ const maxUrlLength = 200;
 
 // Get current tab and initialize UI
 const currentTabId = await getActiveTabId();
+const tabKey = `tab_${currentTabId}`;
 let errorsFound = false;
 let isDebuggerActive: boolean = false;
 checkStatus(currentTabId);
@@ -32,14 +33,12 @@ toggleButton.addEventListener("click", (): void => {
     }
 });
 
-chrome.runtime.onMessage.addListener((message: Message): void => {
-    if (message.type === "secretsDetected" && message.tabId === currentTabId) {
-        displayResults(message.results);
-    } else if (
-        message.type === "errorWhenFetchingScript" &&
-        message.tabId === currentTabId
-    ) {
-        displayErrors(message.errors);
+chrome.storage.session.onChanged.addListener((changes) => {
+    if (changes[tabKey]) {
+        const tabData: TabData = changes[tabKey].newValue;
+
+        displayResults(tabData.results);
+        displayErrors(tabData.errors);
     }
 });
 
