@@ -11,7 +11,7 @@ const patterns = [
     {
         type: "Private Key",
         pattern:
-            /-----BEGIN .*PRIVATE KEY-----[\s\S]*?-----END .*PRIVATE KEY-----/g,
+            /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,
     },
     {
         type: "Stripe Access Token",
