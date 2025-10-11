@@ -2,7 +2,6 @@ import type { ScriptFetchError, SecretResult, TabData } from "./background";
 import { getActiveTabId } from "./browser";
 import { filterWithReason } from "./filter";
 import type { UserActionMessage } from "./messages";
-import type { SecretType } from "./patterns";
 
 const maxMatchLength = 1000;
 const maxErrorLength = 200;
@@ -130,7 +129,7 @@ function displayResults(results: SecretResult[]): void {
 
         const typeDiv = document.createElement("div");
         typeDiv.className = "result-type";
-        typeDiv.textContent = getTypeTitle(result.type);
+        typeDiv.textContent = result.type;
         resultItem.appendChild(typeDiv);
 
         const matchDiv = document.createElement("div");
@@ -204,31 +203,4 @@ function isValidUrl(string: string): boolean {
 
 function truncateString(str: string, maxLength: number): string {
     return str.substring(0, maxLength) + (str.length > maxLength ? "..." : "");
-}
-
-function getTypeTitle(type: SecretType): string {
-    switch (type) {
-        case "privateKey":
-            return "Private Key";
-        case "stripeAccessToken":
-            return "Stripe Access Token";
-        case "slackBotToken":
-            return "Slack Bot Token";
-        case "awsAccessKey":
-            return "AWS Access Key";
-        case "googleApiKey":
-            return "Google API Key";
-        case "anthropicApiKey":
-            return "Anthropic API Key";
-        case "openAIApiKey":
-            return "OpenAI API Key";
-        case "githubToken":
-            return "GitHub Token";
-        case "githubFineGrainedToken":
-            return "GitHub Fine-Grained PAT";
-        case "apiKey":
-            return "API Key";
-        case "password":
-            return "Password";
-    }
 }

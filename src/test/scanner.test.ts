@@ -17,7 +17,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const result = scan(content);
 
         expect(result).toHaveLength(1);
-        expect(result[0].type).toBe("privateKey");
+        expect(result[0].type).toBe("Private Key");
         expect(result[0].match).toContain("-----BEGIN RSA PRIVATE KEY-----");
         expect(result[0].match).toContain("-----END RSA PRIVATE KEY-----");
     });
@@ -38,9 +38,9 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
 
         expect(result).toHaveLength(3);
         expect(result.map((r) => r.type)).toEqual([
-            "privateKey",
-            "privateKey",
-            "privateKey",
+            "Private Key",
+            "Private Key",
+            "Private Key",
         ]);
     });
 
@@ -54,7 +54,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
 
         expect(result).toHaveLength(3);
         result.forEach((secret) => {
-            expect(secret.type).toBe("stripeAccessToken");
+            expect(secret.type).toBe("Stripe Access Token");
         });
         expect(result[0].match).toBe("sk_test_51H8L9fJyKzNmJqS7QkV4Kq3");
         expect(result[1].match).toBe("sk_live_51H8L9fJyKzNmJqS7QkV4Kq3");
@@ -68,7 +68,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
         const result = scan(content);
 
         expect(result).toHaveLength(1);
-        expect(result[0].type).toBe("slackBotToken");
+        expect(result[0].type).toBe("Slack Bot Token");
         expect(result[0].match).toBe(
             "xoxb-12345678901-12345678901-abcdefghijklmnopqrstuvwx",
         );
@@ -81,7 +81,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
         const result = scan(content);
 
         expect(result).toHaveLength(1);
-        expect(result[0].type).toBe("slackBotToken");
+        expect(result[0].type).toBe("Slack Bot Token");
     });
 
     it("should detect API keys with various formats", () => {
@@ -96,7 +96,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
 
         expect(result).toHaveLength(3);
         result.forEach((secret) => {
-            expect(secret.type).toBe("apiKey");
+            expect(secret.type).toBe("API Key");
         });
     });
 
@@ -110,9 +110,9 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
         const result = scan(content);
 
         expect(result).toHaveLength(2);
-        expect(result[0].type).toBe("password");
+        expect(result[0].type).toBe("Password");
         expect(result[0].match).toContain('"secretpassword123"');
-        expect(result[1].type).toBe("password");
+        expect(result[1].type).toBe("Password");
         expect(result[1].match).toContain("'anotherpass456'");
     });
 
@@ -132,10 +132,10 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         expect(result).toHaveLength(4);
         const types = result.map((r) => r.type).sort();
         expect(types).toEqual([
-            "apiKey",
-            "password",
-            "privateKey",
-            "stripeAccessToken",
+            "API Key",
+            "Password",
+            "Private Key",
+            "Stripe Access Token",
         ]);
     });
 
@@ -146,7 +146,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         expect(result).toHaveLength(1);
         const secret = result[0];
 
-        expect(secret.type).toBe("stripeAccessToken");
+        expect(secret.type).toBe("Stripe Access Token");
         expect(typeof secret.pattern).toBe("string");
         expect(typeof secret.match).toBe("string");
     });
@@ -167,8 +167,8 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const result = scan(content);
 
         expect(result).toHaveLength(2);
-        expect(result.some((s) => s.type === "password")).toBe(true);
-        expect(result.some((s) => s.type === "apiKey")).toBe(true);
+        expect(result.some((s) => s.type === "Password")).toBe(true);
+        expect(result.some((s) => s.type === "API Key")).toBe(true);
     });
 
     it("should be case insensitive for API keys and passwords", () => {
@@ -181,8 +181,8 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const result = scan(content);
 
         expect(result).toHaveLength(2);
-        expect(result.some((s) => s.type === "apiKey")).toBe(true);
-        expect(result.some((s) => s.type === "password")).toBe(true);
+        expect(result.some((s) => s.type === "API Key")).toBe(true);
+        expect(result.some((s) => s.type === "Password")).toBe(true);
     });
 
     it("should ignore placeholder passwords", () => {
@@ -222,7 +222,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const result = scan(content);
 
         expect(result).toHaveLength(1);
-        expect(result[0].type).toBe("password");
+        expect(result[0].type).toBe("Password");
         expect(result[0].match).toContain('"actualSecret123"');
     });
 
@@ -248,7 +248,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const result = scan(content);
 
         expect(result).toHaveLength(1);
-        expect(result[0].type).toBe("apiKey");
+        expect(result[0].type).toBe("API Key");
         expect(result[0].match).toContain("'actualSecret123'");
     });
 });
