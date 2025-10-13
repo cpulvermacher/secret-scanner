@@ -1,4 +1,4 @@
-import type { Secret } from "../secrets/scanner";
+import type { Secret } from "../secrets/scan";
 
 export type TabData = {
     isDebuggerActive: boolean;

@@ -1,4 +1,4 @@
-import { scan } from "./secrets/scanner";
+import { scan } from "./secrets/scan";
 import { updateIcon } from "./util/icon";
 import { debugLog } from "./util/log";
 import type { Message, ScriptDetectedMessage } from "./util/messages";
