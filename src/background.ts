@@ -25,7 +25,7 @@ if ("debugger" in chrome) {
         const tabId = source.tabId;
         if (tabId !== undefined) {
             void getTabData(tabId).then((tabData) => {
-                const count = tabData?.results.length || 0;
+                const count = tabData?.results.length ?? 0;
                 updateIcon(tabId, "inactive", count);
             });
         }
@@ -34,11 +34,10 @@ if ("debugger" in chrome) {
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
     void getTabData(activeInfo.tabId).then((tabData) => {
-        const count = tabData?.results.length ?? 0;
         updateIcon(
             activeInfo.tabId,
             tabData?.isDebuggerActive ? "active" : "inactive",
-            count,
+            tabData?.results.length ?? 0,
         );
     });
 });
@@ -49,12 +48,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     }
 
     void getTabData(tabId).then((tabData) => {
-        if (tabData) {
-            const count = tabData.results.length;
-            void updateIcon(tabId, "active", count);
-        } else {
-            void updateIcon(tabId, "inactive", 0);
-        }
+        updateIcon(
+            tabId,
+            tabData?.isDebuggerActive ? "active" : "inactive",
+            tabData?.results.length ?? 0,
+        );
     });
 });
 
