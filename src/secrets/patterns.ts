@@ -15,31 +15,32 @@ const patterns = [
     },
     {
         type: "Stripe Access Token",
-        pattern: /(?:sk|rk)_(?:test|live|prod)_[a-zA-Z0-9]{24}/g,
+        // excludes pk (publishable key) prefix
+        pattern: /\b(?:sk|rk)_(?:test|live|prod)_[a-zA-Z0-9]{24}\b/g,
     },
     {
         type: "Slack Bot Token",
-        pattern: /xoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}/g,
+        pattern: /\bxoxb-[0-9]{11}-[0-9]{11}-[a-zA-Z0-9]{24}\b/g,
     },
     {
         type: "AWS Access Key",
-        pattern: /(?:A3T[A-Z0-9]|AKIA|ASIA|ABIA|ACCA)[A-Z2-7]{16}/g,
+        pattern: /\b(?:A3T[A-Z0-9]|AKIA|ASIA|ABIA|ACCA)[A-Z2-7]{16}\b/g,
     },
     {
         type: "Google API Key",
-        pattern: /AIza[0-9A-Za-z\-_]{35}/g,
+        pattern: /\bAIza[0-9A-Za-z\-_]{35}\b/g,
     },
     {
         type: "Anthropic API Key",
-        pattern: /sk-ant-api[0-9]{2}-[a-zA-Z0-9_-]{94}/g,
+        pattern: /\bsk-ant-api[0-9]{2}-[a-zA-Z0-9_-]{94}\b/g,
     },
     {
         type: "OpenAI API Key",
-        pattern: /sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}/g,
+        pattern: /\bsk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}\b/g,
     },
     {
         type: "GitHub Token",
-        pattern: /(?:ghu|ghs|ghp|gho)_[0-9a-zA-Z]{36}/g,
+        pattern: /\b(?:ghu|ghs|ghp|gho)_[0-9a-zA-Z]{36}\b/g,
     },
     {
         type: "GitHub Fine-Grained PAT",
