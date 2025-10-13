@@ -48,12 +48,12 @@ const patterns = [
     // very generic patterns below
     {
         type: "API Key",
-        pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{6,}['"]/gi,
+        pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{10,180}['"]/gi,
         ignore: /['"]((\))?\.concat\(|.*api[_-]?key)/i,
     },
     {
         type: "Password",
-        pattern: /passw(or)?d\s*[:=]\s*['"][^'"\n]{4,60}['"]/gi,
+        pattern: /passw(or)?d\s*[:=]\s*['"][^'"\n]{6,60}['"]/gi,
         ignore: /['"]([^'"]*password['"]|(\))?\.concat\()/i,
     },
 ] as const;
