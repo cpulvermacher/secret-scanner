@@ -53,7 +53,7 @@ const patterns = [
     },
     {
         type: "Password",
-        pattern: /passw(or)?d\s*[:=]\s*['"][^'"]{4,}['"]/gi,
+        pattern: /passw(or)?d\s*[:=]\s*['"][^'"\n]{4,60}['"]/gi,
         ignore: /['"]([^'"]*password['"]|(\))?\.concat\()/i,
     },
 ] as const;
