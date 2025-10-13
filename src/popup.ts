@@ -112,7 +112,8 @@ function displayResults(results: SecretResult[]): void {
     if (results.length === 0) {
         const noResults = document.createElement("div");
         noResults.className = "no-results";
-        noResults.textContent = "No secrets found";
+        noResults.textContent =
+            "No secrets found. Any secrets detected will be listed here.";
         resultsList.appendChild(noResults);
         cautionText.className = "invisible";
 
