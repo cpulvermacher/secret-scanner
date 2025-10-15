@@ -28,7 +28,7 @@ jobs:
             - name: Create Chrome artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: time-travel-${{ github.ref_name }}-chrome
+                  name: secret-scanner-${{ github.ref_name }}-chrome
                   path: dist/chrome
             - name: Upload to Chrome Web Store
               env:
@@ -37,15 +37,15 @@ jobs:
                   REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
                   EXTENSION_ID: jfcojfckgmgepklcdmmjfgjcgfngckbk
               run: cd dist/chrome && npx chrome-webstore-upload upload
-            # - name: Upload to AMO
-            #   env:
-            #     WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
-            #     WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
-            #   run: cd dist/firefox && npx web-ext sign --channel listed --upload-source-code ../../time-travel-*-src.zip
+            - name: Upload to AMO
+              env:
+                  WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+                  WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+              run: cd dist/firefox && npx web-ext sign --channel listed --upload-source-code ../../secret-scanner-*-src.zip
             - name: Create Firefox artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: time-travel-${{ github.ref_name }}-firefox
+                  name: secret-scanner-${{ github.ref_name }}-firefox
                   path: dist/firefox/web-ext-artifacts
             - name: Release
               env:
