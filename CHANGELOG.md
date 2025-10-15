@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4.1]
+
+- Stricter detection of all secret types to reduce false positives
+
 ## [0.4.0]
 
 - Fix tab state being lost
