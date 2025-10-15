@@ -25,4 +25,6 @@ Page security settings may prevent the extension from scanning some scripts. Opt
 
 ## Installation
 
-This extension is compatible with Chromium-based browsers (version 140+). For Chrome, Opera, Edge, and other Chromium-based browsers, install the extension from the Chrome Web Store: https://chromewebstore.google.com/detail/secret-scanner/jfcojfckgmgepklcdmmjfgjcgfngckbk
+For Chrome, Opera, Edge, and other Chromium-based browsers, install the extension from the Chrome Web Store: https://chromewebstore.google.com/detail/secret-scanner/jfcojfckgmgepklcdmmjfgjcgfngckbk
+
+For Firefox (Desktop or Android), install it from: https://addons.mozilla.org/en-US/firefox/addon/secret_scanner/
