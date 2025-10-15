@@ -31,4 +31,5 @@ gh release create "${TAG}" \
     --title "${TAG}" \
     $RELEASE_OPTS \
     -n "$CHANGELOG" \
-    "secret-scanner-*-chrome.zip"
+    "secret-scanner-*-chrome.zip" \
+    "secret-scanner-*-firefox.zip"
