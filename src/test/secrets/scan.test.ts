@@ -254,7 +254,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
 
         expect(result).toHaveLength(1);
         expect(result[0].type).toBe("API Key");
-        expect(result[0].match).toContain("'actualSecret123'");
+        expect(result[0].match).toBe("actualApiKey: 'actualSecret123'");
     });
 
     it("should detect AWS access keys", () => {

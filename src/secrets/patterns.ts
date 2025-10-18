@@ -49,7 +49,7 @@ const patterns = [
     // very generic patterns below
     {
         type: "API Key",
-        pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{10,180}['"]/gi,
+        pattern: /\b[\w-]{0,50}?api[_-]?key\s*[:=]\s*['"][^'"]{10,180}['"]/gi,
         ignore: /['"]((\))?\.concat\(|.*api[_-]?key)/i,
     },
     {
