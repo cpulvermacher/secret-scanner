@@ -43,16 +43,19 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-    if (changeInfo.url === undefined) {
-        return; // url unchanged, nothing to do
+    //loading status happens on navigation or reload
+    if (changeInfo.status !== "loading") {
+        return; //ignore everything else
     }
 
-    void getTabData(tabId).then((tabData) => {
-        updateIcon(
-            tabId,
-            tabData?.isDebuggerActive ? "active" : "inactive",
-            tabData?.results.length ?? 0,
-        );
+    // Clear tab storage on navigation
+    updateTabData(tabId, async (tabData) => {
+        tabData.results = [];
+        tabData.errors = [];
+        //leave isDebuggerActive unchanged
+
+        // Update icon to reflect cleared state
+        updateIcon(tabId, tabData.isDebuggerActive ? "active" : "inactive", 0);
     });
 });
 
