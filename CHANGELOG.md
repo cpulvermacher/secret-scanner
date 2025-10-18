@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4.2]
+
+- Clear results on navigation
+
 ## [0.4.1]
 
 - Stricter detection of all secret types to reduce false positives
