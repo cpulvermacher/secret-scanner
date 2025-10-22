@@ -7,15 +7,15 @@ const maxMatchLength = 1000;
 const maxErrorLength = 200;
 const maxUrlLength = 200;
 
-// Get current tab and initialize UI
-const currentTabId = await getActiveTabId();
-checkStatus(currentTabId);
-
 // UI elements
 const loading = document.getElementById("loading") as HTMLElement;
 const resultsList = document.getElementById("resultsList") as HTMLElement;
 const errorList = document.getElementById("errorList") as HTMLElement;
 const cautionText = document.getElementById("caution") as HTMLElement;
+
+// Get current tab and initialize UI
+const currentTabId = await getActiveTabId();
+checkStatus(currentTabId);
 
 chrome.storage.session.onChanged.addListener((changes) => {
     const tabKey = `tab_${currentTabId}`;
