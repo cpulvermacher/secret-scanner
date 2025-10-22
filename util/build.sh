@@ -43,7 +43,6 @@ mkdir -p dist/firefox
 cp -r dist/chrome/* dist/firefox/
 cat dist/chrome/manifest.json |
     jq '.background.scripts = [.background.service_worker] | del(.background.service_worker) | del(.version_name) ' |
-    jq '.permissions = (.permissions - ["debugger"])' |
     jq '. * input' - "src/manifest.firefox.json" \
         >dist/firefox/manifest.json
 

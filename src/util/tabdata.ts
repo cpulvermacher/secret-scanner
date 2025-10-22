@@ -1,7 +1,6 @@
 import type { Secret } from "../secrets/scan";
 
 export type TabData = {
-    isDebuggerActive: boolean;
     results: SecretResult[];
     errors: ScriptFetchError[];
 };
@@ -48,7 +47,6 @@ export async function updateTabData(
         let tabData = await getTabData(tabId);
         if (!tabData) {
             tabData = {
-                isDebuggerActive: false,
                 results: [],
                 errors: [],
             };
