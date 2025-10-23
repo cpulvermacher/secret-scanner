@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.5.0]
+
+- Chrome: Remove debugger backend functionality
+
 ## [0.4.2]
 
 - Clear results on navigation
