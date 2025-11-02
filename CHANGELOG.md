@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.5.1]
+
+- Fix non-zero count being shown without results in some cases
+
 ## [0.5.0]
 
 - Chrome: Remove debugger backend functionality
