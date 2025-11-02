@@ -31,7 +31,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
         tabData.results = [];
         tabData.errors = [];
 
-        // Update icon to reflect cleared state
         updateIcon(tabId, 0);
     });
 });
