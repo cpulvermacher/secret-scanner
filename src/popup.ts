@@ -20,7 +20,7 @@ checkStatus(currentTabId);
 chrome.storage.session.onChanged.addListener((changes) => {
     const tabKey = `tab_${currentTabId}`;
     if (changes[tabKey]) {
-        const tabData: TabData = changes[tabKey].newValue;
+        const tabData = changes[tabKey].newValue as TabData;
 
         displayResults(tabData.results);
         displayErrors(tabData.errors);

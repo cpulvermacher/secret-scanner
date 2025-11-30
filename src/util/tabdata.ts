@@ -25,7 +25,7 @@ function getTabKey(tabId: number) {
 export async function getTabData(tabId: number): Promise<TabData | undefined> {
     const key = getTabKey(tabId);
     const result = await chrome.storage.session.get(key);
-    return result[key];
+    return result[key] as TabData | undefined;
 }
 
 export async function deleteTabData(tabId: number): Promise<void> {
