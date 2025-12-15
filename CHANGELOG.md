@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.6.0]
+
+- Add severity badge to results.
+- Show Google API keys found as medium severity - the majority of those is meant to be public.
+- Show passwords found as medium severity - frequently matches UI translations.
+
 ## [0.5.1]
 
 - Fix non-zero count being shown without results in some cases
