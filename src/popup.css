@@ -81,6 +81,28 @@ a {
     font-weight: 600;
     color: #dc2626;
     margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.severity-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+.severity-high {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.severity-medium {
+    background-color: #f59e0b;
+    color: #ffffff;
 }
 
 .result-source {

@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(handleMessage);
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
     void getTabData(activeInfo.tabId).then((tabData) => {
-        updateIcon(activeInfo.tabId, tabData?.results.length ?? 0);
+        updateIcon(activeInfo.tabId, tabData?.results ?? []);
     });
 });
 
@@ -31,7 +31,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
         tabData.results = [];
         tabData.errors = [];
 
-        updateIcon(tabId, 0);
+        updateIcon(tabId, []);
     });
 });
 
@@ -133,6 +133,6 @@ async function scanForSecrets(
             }
         });
 
-        updateIcon(tabId, tabData.results.length);
+        updateIcon(tabId, tabData.results);
     });
 }

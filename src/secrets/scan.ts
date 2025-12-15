@@ -1,9 +1,10 @@
-import { type SecretType, secretPatterns } from "./patterns";
+import { type SecretType, type Severity, secretPatterns } from "./patterns";
 
 export type Secret = {
     type: SecretType;
     pattern: string;
     match: string; // the found secret
+    severity: Severity;
 };
 
 export function scan(content: string): Secret[] {
@@ -37,6 +38,7 @@ export function scan(content: string): Secret[] {
                 type: pattern.type,
                 pattern: pattern.pattern.source,
                 match: match[0],
+                severity: pattern.severity,
             });
         }
     });

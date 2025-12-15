@@ -64,7 +64,16 @@ function displayResults(results: SecretResult[]): void {
 
         const typeDiv = document.createElement("div");
         typeDiv.className = "result-type";
-        typeDiv.textContent = result.type;
+
+        const typeText = document.createElement("span");
+        typeText.textContent = result.type;
+        typeDiv.appendChild(typeText);
+
+        const severityBadge = document.createElement("span");
+        severityBadge.className = `severity-badge severity-${result.severity}`;
+        severityBadge.textContent = result.severity.toUpperCase();
+        typeDiv.appendChild(severityBadge);
+
         resultItem.appendChild(typeDiv);
 
         const matchDiv = document.createElement("div");
