@@ -270,4 +270,29 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         expect(result[0].type).toBe("AWS Access Key");
         expect(result[0].match).toBe("AKIAAAABBBCCCDDDEEEF");
     });
+
+    it("should assign high severity to private keys", () => {
+        const content = `
+				const privateKey = \`-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
+MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
+-----END RSA PRIVATE KEY-----\`;
+			`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].severity).toBe("high");
+    });
+
+    it("should assign medium severity to passwords", () => {
+        const content = `
+				const dbConfig = {
+					password: "secretpassword123"
+				};
+			`;
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].severity).toBe("medium");
+    });
 });
