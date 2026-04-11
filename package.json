@@ -14,7 +14,7 @@
         "@biomejs/biome": "2.3.11",
         "@types/chrome": "^0.1.32",
         "chrome-webstore-upload-cli": "^3.5.0",
-        "typescript": "^5.9.3",
+        "typescript": "^6.0.2",
         "vite": "^7.3.0",
         "vitest": "^4.0.16",
         "web-ext": "^10.1.0"
