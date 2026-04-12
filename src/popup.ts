@@ -1,6 +1,5 @@
 import type { ScriptFetchError, SecretResult, TabData } from "./util/tabdata";
 import { getActiveTabId } from "./util/browser";
-import { filterWithReason } from "./util/filter";
 import type { UserActionMessage } from "./util/messages";
 
 const maxMatchLength = 1000;
@@ -54,11 +53,7 @@ function displayResults(results: SecretResult[]): void {
         return;
     }
 
-    const filteredResults = results.filter(
-        (secret) => filterWithReason(secret) === null,
-    );
-
-    for (const result of filteredResults) {
+    for (const result of results) {
         const resultItem = document.createElement("div");
         resultItem.className = "result-item";
 

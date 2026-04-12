@@ -1,4 +1,5 @@
 import { scan } from "./secrets/scan";
+import { filterWithReason } from "./util/filter";
 import { updateIcon } from "./util/icon";
 import { debugLog } from "./util/log";
 import type { Message, ScriptDetectedMessage } from "./util/messages";
@@ -121,15 +122,19 @@ async function scanForSecrets(
             const isDuplicate = tabData.results.some(
                 (existing) =>
                     existing.match === result.match &&
-                    existing.source === source,
+                    existing.source === source
             );
 
             if (!isDuplicate) {
-                tabData.results.push({
+                const secretResult = {
                     source: source,
                     timestamp: new Date().toISOString(),
                     ...result,
-                });
+                };
+
+                if (filterWithReason(secretResult) === null) {
+                    tabData.results.push(secretResult);
+                }
             }
         });
 
