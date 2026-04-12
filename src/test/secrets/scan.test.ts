@@ -74,7 +74,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
         expect(result).toHaveLength(1);
         expect(result[0].type).toBe("Slack Bot Token");
         expect(result[0].match).toBe(
-            "xoxb-12345678901-12345678901-abcdefghijklmnopqrstuvwx",
+            "xoxb-12345678901-12345678901-abcdefghijklmnopqrstuvwx"
         );
     });
 
@@ -204,7 +204,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
 
     it("should ignore .concat artifacts in passwords", () => {
         const result = scan(
-            `"password: ".concat(e instanceof Error?g.message:"?")`,
+            `"password: ".concat(e instanceof Error?g.message:"?")`
         );
         expect(result).toHaveLength(0);
 

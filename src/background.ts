@@ -50,7 +50,7 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
 function handleMessage(
     message: Message,
     sender: chrome.runtime.MessageSender,
-    sendResponse: (response?: object) => void,
+    sendResponse: (response?: object) => void
 ) {
     if (message.type === "scriptDetected") {
         handleScriptDetectedMessage(message, sender.tab?.id);
@@ -76,7 +76,7 @@ function handleMessage(
 /** handler for scripts detected via content script */
 async function handleScriptDetectedMessage(
     msg: ScriptDetectedMessage,
-    tabId?: number,
+    tabId?: number
 ) {
     if (!tabId) {
         console.error("No tab ID in scriptDetected message");
@@ -95,7 +95,7 @@ async function handleScriptDetectedMessage(
         } catch (error) {
             await updateTabData(tabId, async (errorTabData) => {
                 const isDuplicate = errorTabData.errors.some(
-                    (e) => e.scriptUrl === msg.url,
+                    (e) => e.scriptUrl === msg.url
                 );
                 if (!isDuplicate) {
                     errorTabData.errors.push({
@@ -113,7 +113,7 @@ async function handleScriptDetectedMessage(
 async function scanForSecrets(
     tabId: number,
     content: string,
-    source: string,
+    source: string
 ): Promise<void> {
     await updateTabData(tabId, async (tabData) => {
         const results = scan(content);

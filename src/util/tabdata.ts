@@ -41,7 +41,7 @@ export async function deleteTabData(tabId: number): Promise<void> {
  */
 export async function updateTabData(
     tabId: number,
-    update: (data: TabData) => Promise<void>,
+    update: (data: TabData) => Promise<void>
 ): Promise<TabData> {
     return await navigator.locks.request(tabDataLockName, async () => {
         let tabData = await getTabData(tabId);

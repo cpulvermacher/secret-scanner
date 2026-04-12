@@ -27,7 +27,7 @@ export function scan(content: string): Secret[] {
             const matchStart = match.index;
             const matchEnd = match.index + match[0].length;
             const hasOverlap = matchedRanges.some(
-                (range) => matchStart < range.end && matchEnd > range.start,
+                (range) => matchStart < range.end && matchEnd > range.start
             );
             if (hasOverlap) {
                 continue;
