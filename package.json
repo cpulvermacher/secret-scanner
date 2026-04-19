@@ -15,8 +15,8 @@
         "@types/chrome": "^0.1.32",
         "chrome-webstore-upload-cli": "^3.5.0",
         "typescript": "^6.0.2",
-        "vite": "^7.3.0",
-        "vitest": "^4.0.16",
+        "vite": "^8.0.8",
+        "vitest": "^4.1.4",
         "web-ext": "^10.1.0"
     }
 }
