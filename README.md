@@ -16,7 +16,7 @@ Pages are automatically scanned in the background, and the number of found secre
 ## Limitations
 
 - Used bandwidth may increase. Consider only enabling the extension when needed on metered mobile connections.
-- Detected secrets may be false positives
+- Detected secrets may be false positives or meant to be public (e.g. some Google API keys).
 - May not catch dynamically constructed or obfuscated secrets.
 - Does not scan scripts only loaded by other scripts.
 
