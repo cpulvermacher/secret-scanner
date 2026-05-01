@@ -9,7 +9,6 @@
         "test": "vitest --run",
         "lint": "tsc && biome lint src/"
     },
-    "packageManager": "pnpm@10.33.0",
     "devDependencies": {
         "@biomejs/biome": "^2.4.10",
         "@types/chrome": "^0.1.32",
@@ -18,5 +17,6 @@
         "vite": "^8.0.8",
         "vitest": "^4.1.4",
         "web-ext": "^10.1.0"
-    }
+    },
+    "packageManager": "pnpm@10.33.2"
 }
