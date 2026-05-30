@@ -11,11 +11,11 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.4.10",
-        "@types/chrome": "^0.1.32",
+        "@types/chrome": "^0.1.42",
         "chrome-webstore-upload-cli": "^3.5.0",
-        "typescript": "^6.0.2",
-        "vite": "^8.0.8",
-        "vitest": "^4.1.4",
+        "typescript": "^6.0.3",
+        "vite": "^8.0.14",
+        "vitest": "^4.1.7",
         "web-ext": "^10.1.0"
     },
     "packageManager": "pnpm@10.33.2"
