@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.4.16
+        specifier: 2.4.16
         version: 2.4.16
       '@types/chrome':
         specifier: ^0.1.42

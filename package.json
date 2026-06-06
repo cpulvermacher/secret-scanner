@@ -10,7 +10,7 @@
         "lint": "tsc && biome lint src/"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.16",
+        "@biomejs/biome": "2.4.16",
         "@types/chrome": "^0.1.42",
         "chrome-webstore-upload-cli": "^3.5.0",
         "typescript": "^6.0.3",
