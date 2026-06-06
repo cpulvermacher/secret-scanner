@@ -57,6 +57,16 @@ const patterns = [
         pattern: /github_pat_\w{82}/g,
         severity: "high",
     },
+    {
+        type: "JWT",
+        pattern: /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g,
+        severity: "medium",
+    },
+    {
+        type: "Basic Auth Credentials",
+        pattern: /\bBasic\s+[A-Za-z0-9+/]{16,}={0,2}/g,
+        severity: "high",
+    },
     // very generic patterns below
     {
         type: "API Key",

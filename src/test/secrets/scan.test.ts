@@ -284,6 +284,43 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         expect(result[0].severity).toBe("high");
     });
 
+    it("should detect JWTs", () => {
+        const content = `
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        `;
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].type).toBe("JWT");
+        expect(result[0].severity).toBe("medium");
+        expect(result[0].match).toContain("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
+    });
+
+    it("should not flag short or incomplete JWT-like strings", () => {
+        const content = `const x = "eyJhbGci.eyJzdWI.abc";`; // too short
+        const result = scan(content);
+        expect(result).toHaveLength(0);
+    });
+
+    it("should detect Basic Auth credentials", () => {
+        const content = `
+            headers["Authorization"] = "Basic dXNlcjpwYXNzd29yZA==";
+        `;
+        const result = scan(content);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].type).toBe("Basic Auth Credentials");
+        expect(result[0].severity).toBe("high");
+        expect(result[0].match).toContain("Basic dXNlcjpwYXNzd29yZA==");
+    });
+
+    it("should not flag Basic Auth realm challenges", () => {
+        // WWW-Authenticate challenge — no base64 credentials
+        const content = `header = 'Basic realm="My App"';`;
+        const result = scan(content);
+        expect(result).toHaveLength(0);
+    });
+
     it("should assign medium severity to passwords", () => {
         const content = `
 				const dbConfig = {
