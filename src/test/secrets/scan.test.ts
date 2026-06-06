@@ -91,9 +91,9 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
     it("should detect API keys with various formats", () => {
         const content = `
 				const config = {
-					api_key: "abc123def456",
-					apiKey: 'xyz789uvw012',
-					api-key = "another-secret-key"
+					api_key: "abc123def456ghi789jkl",
+					apiKey: 'xyz789uvw012mno345pqr',
+					api-key = "another-secret-key-value"
 				};
 			`;
         const result = scan(content);
@@ -123,7 +123,7 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiqJePLVB9RWam
     it("should detect multiple different secret types in one scan", () => {
         const content = `
 				const config = {
-					apiKey: "secret--key-123",
+					apiKey: "secret--key-123-abcdefgh",
 					password: "mypassword123",
 					stripeKey: "sk_test_51H8L9fJyKzNmJqS7QkV4Kq3"
 				};
@@ -164,7 +164,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
 							password: "db-secret-123"
 						},
 						api: {
-							api_key: "secret-key-456"
+							api_key: "secret-key-456-abcdefgh"
 						}
 					};
 				}
@@ -179,7 +179,7 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
     it("should be case insensitive for API keys and passwords", () => {
         const content = `
 				const config = {
-					API_KEY: "uppercase-key",
+					API_KEY: "uppercase-key-abcdefghij",
 					Password: "mixed-case-something"
 				};
 			`;
@@ -247,14 +247,14 @@ MIIEowIBAAKCAQEA4qiXjy1QfUVmphYeT0QKJ4GV6nN5fD6l8LqNVlJGl2p3K5Hp
         const content = `
                 someApiKey: "<place your_api_key here>",
                 someOtherApiKey: "MYAPIKEY",
-                actualApiKey: 'actualSecret123'
+                actualApiKey: 'actualSecret123abcdefgh'
             `;
 
         const result = scan(content);
 
         expect(result).toHaveLength(1);
         expect(result[0].type).toBe("API Key");
-        expect(result[0].match).toBe("actualApiKey: 'actualSecret123'");
+        expect(result[0].match).toBe("actualApiKey: 'actualSecret123abcdefgh'");
     });
 
     it("should detect AWS access keys", () => {
