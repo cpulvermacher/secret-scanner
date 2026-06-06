@@ -4,7 +4,6 @@
 [![Chrome Web Store](https://flat.badgen.net/chrome-web-store/v/jfcojfckgmgepklcdmmjfgjcgfngckbk)](https://chromewebstore.google.com/detail/secret-scanner/jfcojfckgmgepklcdmmjfgjcgfngckbk)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/secret_scanner?style=flat-square)](https://addons.mozilla.org/en-US/firefox/addon/secret_scanner/)
 [![Installs](https://flat.badgen.net/chrome-web-store/users/jfcojfckgmgepklcdmmjfgjcgfngckbk)](https://chromewebstore.google.com/detail/secret-scanner/jfcojfckgmgepklcdmmjfgjcgfngckbk)
-[![Status](https://flat.badgen.net/github/checks/cpulvermacher/secret-scanner)](https://github.com/cpulvermacher/secret-scanner/actions/workflows/node.js.yml)
 [![License](https://flat.badgen.net/github/license/cpulvermacher/secret-scanner)](./LICENSE)
 
 A browser extension that scans JavaScript files loaded by websites for embedded secrets like private keys or passwords.
