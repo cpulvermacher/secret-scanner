@@ -94,7 +94,11 @@ function displayResults(results: SecretResult[]): void {
             });
             sourceDiv.appendChild(link);
         } else {
-            sourceDiv.appendChild(document.createTextNode(result.source));
+            sourceDiv.appendChild(
+                document.createTextNode(
+                    truncateString(result.source, maxUrlLength)
+                )
+            );
         }
 
         resultItem.appendChild(sourceDiv);
@@ -131,10 +135,11 @@ function displayErrors(errors: ScriptFetchError[]) {
     }
 }
 
+const linkableProtocols = new Set(["http:", "https:", "file:"]);
+
 function isValidUrl(string: string): boolean {
     try {
-        new URL(string);
-        return true;
+        return linkableProtocols.has(new URL(string).protocol);
     } catch {
         return false;
     }
