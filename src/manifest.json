@@ -5,7 +5,7 @@
     "version": "__VERSION__",
     "version_name": "__VERSION_NAME__",
     "minimum_chrome_version": "140",
-    "permissions": ["activeTab", "storage"],
+    "permissions": ["storage"],
     "background": {
         "service_worker": "background.js",
         "type": "module"
