@@ -33,4 +33,7 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 
-observer.observe(document.body, { childList: true, subtree: true });
+const observeRoot = document.documentElement ?? document.body;
+if (observeRoot) {
+    observer.observe(observeRoot, { childList: true, subtree: true });
+}
