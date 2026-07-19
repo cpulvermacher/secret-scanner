@@ -4,9 +4,9 @@ import { updateIcon } from "./util/icon";
 import { debugLog } from "./util/log";
 import type { Message, ScriptDetectedMessage } from "./util/messages";
 import {
-    type TabData,
     deleteTabData,
     getTabData,
+    type TabData,
     updateTabData,
 } from "./util/tabdata";
 
@@ -54,11 +54,21 @@ function handleMessage(
     sendResponse: (response?: object) => void
 ) {
     if (message.type === "scriptDetected") {
-        handleScriptDetectedMessage(message, sender.tab?.id);
+        if (sender.tab?.id === undefined) {
+            console.error("No tab ID in scriptDetected message");
+            return;
+        }
+
+        handleScriptDetectedMessage(message, sender.tab.id);
     } else if (
         message.type === "userAction" &&
         message.action === "getStatus"
     ) {
+        //check this is from our popup
+        if (sender.id !== chrome.runtime.id || sender.tab !== undefined) {
+            return;
+        }
+
         getTabData(message.tabId)
             .then((tabData) => {
                 const response: TabData = tabData ?? {
@@ -77,13 +87,8 @@ function handleMessage(
 /** handler for scripts detected via content script */
 async function handleScriptDetectedMessage(
     msg: ScriptDetectedMessage,
-    tabId?: number
+    tabId: number
 ) {
-    if (!tabId) {
-        console.error("No tab ID in scriptDetected message");
-        return;
-    }
-
     let content: string | undefined;
     const sourceUrl = "url" in msg ? msg.url : msg.documentUrl;
     if ("content" in msg) {
