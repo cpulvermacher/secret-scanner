@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.7.1]
+
+- Avoid errors if document.body is null.
+- Don't add source link for data: URLs.
+- Remove unused `activeTab` permission.
+
 ## [0.7.0]
 - Detect basic auth secrets and JWTs.
 - Reduce false positives for 'API Key' type.
