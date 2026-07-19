@@ -27,9 +27,15 @@ export function updateIcon(tabId: number, results: SecretResult[]): void {
     const badgeText = count > 0 ? count.toString() : "";
     const badgeColor = getBadgeColor(getHighestSeverity(results));
 
-    chrome.action.setBadgeText({ text: badgeText, tabId });
+    const ignoreClosedTab = () => {};
+
+    chrome.action
+        .setBadgeText({ text: badgeText, tabId })
+        .catch(ignoreClosedTab);
 
     if (count > 0) {
-        chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
+        chrome.action
+            .setBadgeBackgroundColor({ color: badgeColor, tabId })
+            .catch(ignoreClosedTab);
     }
 }

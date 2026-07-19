@@ -4,7 +4,7 @@ export async function getActiveTabId(): Promise<number> {
     // `tab` will either be a `tabs.Tab` instance or `undefined`.
     const [tab] = await chrome.tabs.query(queryOptions);
     // Note: 'activeTab' permission only needed for title & url-related properties
-    if (tab.id === undefined) {
+    if (tab?.id === undefined) {
         throw new Error("Couldn't get active tab");
     }
 
