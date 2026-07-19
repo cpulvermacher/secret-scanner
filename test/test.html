@@ -14,7 +14,7 @@
     </head>
     <body>
         <h1>Test Page for Secret Detection</h1>
-        <p>Expected number of secrets: 10</p>
+        <p>Expected number of secrets: 11</p>
 
         <script>
             // Inline script with a fake private key
@@ -34,5 +34,13 @@ vWN4r1ZQRhVfhUB8eOKaOsAT1oWIJzNzNqmyFU9gTJMwNdOdC3F+5MRbVzw8cQmG
         <script src="external-test.js"></script>
 
         <script src="data:text/javascript,const dataUrlToken = &quot;ghp_abcdefghijklmnopqrstuvwxyz0123456789&quot;;"></script>
+
+        <script>
+            // Check MutationObserver
+            const dynamicScript = document.createElement("script");
+            dynamicScript.textContent =
+                'const dynamicKey = "AIza11111111111111111111111111111111111";';
+            document.body.appendChild(dynamicScript);
+        </script>
     </body>
 </html>
