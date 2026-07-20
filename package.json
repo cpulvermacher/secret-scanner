@@ -13,7 +13,7 @@
         "@biomejs/biome": "2.4.16",
         "@types/chrome": "^0.1.42",
         "chrome-webstore-upload-cli": "^3.5.0",
-        "typescript": "^6.0.3",
+        "typescript": "^7.0.2",
         "vite": "^8.0.16",
         "vitest": "^4.1.8",
         "web-ext": "^10.3.0"
