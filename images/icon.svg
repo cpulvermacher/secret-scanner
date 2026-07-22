@@ -1,4 +1,28 @@
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-  <polygon points="64,6 110.86,32 110.86,96 64,122 17.14,96 17.14,32" fill="none" stroke="#b91c1c" stroke-width="8"/>
-  <text x="64" y="90" text-anchor="middle" fill="#b91c1c" font-family="Arial, sans-serif" font-size="80" font-weight="bold">S</text>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs id="defs1" />
+  <polygon
+     points="64,6 114.23,35 114.23,93 64,122 13.77,93 13.77,35"
+     fill="none"
+     stroke="#b91c1c"
+     stroke-width="8"
+     id="polygon1" />
+  <text
+     x="64"
+     y="92.335022"
+     text-anchor="middle"
+     fill="#b91c1c"
+     font-family="Arial, sans-serif"
+     font-size="80px"
+     font-weight="bold"
+     id="text1">S</text>
 </svg>
