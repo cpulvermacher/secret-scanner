@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.7.2]
+- Update icon.
+
 ## [0.7.1]
 
 - Avoid errors if document.body is null.
