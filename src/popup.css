@@ -12,7 +12,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-@media (min-width: 400px) {
+@media (min-width: 360px) {
     body {
         font-size: 1em;
         width: auto;
