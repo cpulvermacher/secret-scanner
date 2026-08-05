@@ -12,6 +12,13 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+@media (min-width: 400px) {
+    body {
+        font-size: 1em;
+        width: auto;
+    }
+}
+
 .header {
     display: flex;
     align-items: center;
