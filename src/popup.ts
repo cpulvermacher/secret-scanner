@@ -144,7 +144,9 @@ function createResultItem(
         ignoreButton.className = "link-button";
         ignoreButton.textContent = isIgnored
             ? "Stop ignoring"
-            : `Ignore on ${result.site}`;
+            : result.site === "file:"
+              ? "Ignore for file URLs"
+              : `Ignore on ${result.site}`;
         ignoreButton.addEventListener("click", () => {
             ignoreButton.disabled = true;
             void setIgnored(result, !isIgnored);
