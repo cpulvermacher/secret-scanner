@@ -21,7 +21,7 @@ export type GetStatusMessage = {
     tabId: number;
 };
 
-/** mark a secret as "known public, ignore" (or undo this) for the given site */
+/** mark a secret as ignored (or undo this) for the given site */
 export type SetIgnoredMessage = {
     type: "userAction";
     action: "setIgnored";

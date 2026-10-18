@@ -81,7 +81,7 @@ function displayIgnored(ignored: SecretResult[]): void {
     ignoredList.replaceChildren();
     ignoredSection.className =
         ignored.length > 0 ? "ignored-section" : "ignored-section invisible";
-    ignoredSummary.textContent = `Ignored as known public (${ignored.length})`;
+    ignoredSummary.textContent = `Ignored (${ignored.length})`;
 
     for (const result of ignored) {
         ignoredList.appendChild(createResultItem(result, true));
@@ -144,7 +144,7 @@ function createResultItem(
         ignoreButton.className = "link-button";
         ignoreButton.textContent = isIgnored
             ? "Stop ignoring"
-            : `Known public, ignore on ${result.site}`;
+            : `Ignore on ${result.site}`;
         ignoreButton.addEventListener("click", () => {
             ignoreButton.disabled = true;
             void setIgnored(result, !isIgnored);

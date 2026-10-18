@@ -103,7 +103,7 @@ function handleMessage(
     }
 }
 
-/** handler for marking a secret as "known public, ignore" (or undoing it) in the popup */
+/** handler for marking a secret as ignored (or undoing it) in the popup */
 async function handleSetIgnoredMessage(msg: SetIgnoredMessage) {
     await setIgnored(msg.site, msg.match, msg.ignored);
 

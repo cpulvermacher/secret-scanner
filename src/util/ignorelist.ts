@@ -1,4 +1,4 @@
-// Per-site list of secrets the user marked as "known public, ignore".
+// Per-site list of secrets the user marked as ignored.
 // Only SHA-256 hashes of the secrets are stored, in chrome.storage.local.
 
 const ignoreListLockName = "ignoreListLock";

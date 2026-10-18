@@ -2,7 +2,7 @@ import type { Secret } from "../secrets/scan";
 
 export type TabData = {
     results: SecretResult[];
-    ignored: SecretResult[]; // results the user marked as "known public, ignore"
+    ignored: SecretResult[]; // results the user marked as ignored
     errors: ScriptFetchError[];
 };
 
