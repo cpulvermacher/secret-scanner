@@ -18,5 +18,5 @@
         "vitest": "^5.0.0",
         "web-ext": "^10.6.0"
     },
-    "packageManager": "pnpm@12.4.1"
+    "packageManager": "pnpm@12.10.1"
 }
