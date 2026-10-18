@@ -13,10 +13,22 @@ type ScriptSource =
           content: string;
       };
 
-export type UserActionMessage = {
+export type UserActionMessage = GetStatusMessage | SetIgnoredMessage;
+
+export type GetStatusMessage = {
     type: "userAction";
-    action: UserAction;
+    action: "getStatus";
     tabId: number;
 };
 
-export type UserAction = "getStatus";
+/** mark a secret as "known public, ignore" (or undo this) for the given site */
+export type SetIgnoredMessage = {
+    type: "userAction";
+    action: "setIgnored";
+    tabId: number;
+    site: string;
+    match: string;
+    ignored: boolean;
+};
+
+export type UserAction = UserActionMessage["action"];

@@ -1,11 +1,22 @@
 import { scan } from "./secrets/scan";
 import { filterWithReason } from "./util/filter";
 import { updateIcon } from "./util/icon";
+import {
+    getIgnoredHashes,
+    getSite,
+    hashSecret,
+    setIgnored,
+} from "./util/ignorelist";
 import { debugLog } from "./util/log";
-import type { Message, ScriptDetectedMessage } from "./util/messages";
+import type {
+    Message,
+    ScriptDetectedMessage,
+    SetIgnoredMessage,
+} from "./util/messages";
 import {
     deleteTabData,
     getTabData,
+    type SecretResult,
     type TabData,
     updateTabData,
 } from "./util/tabdata";
@@ -30,6 +41,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     // Clear tab storage on navigation
     updateTabData(tabId, async (tabData) => {
         tabData.results = [];
+        tabData.ignored = [];
         tabData.errors = [];
 
         updateIcon(tabId, []);
@@ -60,28 +72,54 @@ function handleMessage(
         }
 
         handleScriptDetectedMessage(message, sender.tab.id);
-    } else if (
-        message.type === "userAction" &&
-        message.action === "getStatus"
-    ) {
+    } else if (message.type === "userAction") {
         //check this is from our popup
         if (sender.id !== chrome.runtime.id || sender.tab !== undefined) {
             return;
         }
 
-        getTabData(message.tabId)
-            .then((tabData) => {
-                const response: TabData = tabData ?? {
-                    results: [],
-                    errors: [],
-                };
-                sendResponse(response);
-            })
-            .catch((error: Error) => {
-                sendResponse({ status: "error", error });
-            });
-        return true;
+        if (message.action === "getStatus") {
+            getTabData(message.tabId)
+                .then((tabData) => {
+                    const response: TabData = tabData ?? {
+                        results: [],
+                        ignored: [],
+                        errors: [],
+                    };
+                    sendResponse(response);
+                })
+                .catch((error: Error) => {
+                    sendResponse({ status: "error", error });
+                });
+            return true;
+        } else if (message.action === "setIgnored") {
+            handleSetIgnoredMessage(message)
+                .then(() => sendResponse({}))
+                .catch((error: Error) => {
+                    sendResponse({ status: "error", error });
+                });
+            return true;
+        }
     }
+}
+
+/** handler for marking a secret as "known public, ignore" (or undoing it) in the popup */
+async function handleSetIgnoredMessage(msg: SetIgnoredMessage) {
+    await setIgnored(msg.site, msg.match, msg.ignored);
+
+    await updateTabData(msg.tabId, async (tabData) => {
+        // move all matching results (possibly from multiple scripts) to the other list
+        const isAffected = (result: SecretResult) =>
+            result.site === msg.site && result.match === msg.match;
+        const all = [...tabData.results, ...tabData.ignored];
+        const isIgnored = (result: SecretResult) =>
+            isAffected(result) ? msg.ignored : tabData.ignored.includes(result);
+
+        tabData.results = all.filter((result) => !isIgnored(result));
+        tabData.ignored = all.filter(isIgnored);
+
+        updateIcon(msg.tabId, tabData.results);
+    });
 }
 
 /** handler for scripts detected via content script */
@@ -113,18 +151,30 @@ async function handleScriptDetectedMessage(
             return;
         }
     }
-    await scanForSecrets(tabId, content, sourceUrl);
+    await scanForSecrets(tabId, content, sourceUrl, getSite(msg.documentUrl));
 }
 
 async function scanForSecrets(
     tabId: number,
     content: string,
-    source: string
+    source: string,
+    site: string
 ): Promise<void> {
+    const results = scan(content);
+    if (results.length === 0) {
+        return;
+    }
+
+    const ignoredHashes = await getIgnoredHashes(site);
+    const isIgnored = await Promise.all(
+        results.map(async (result) =>
+            ignoredHashes.has(await hashSecret(result.match))
+        )
+    );
+
     await updateTabData(tabId, async (tabData) => {
-        const results = scan(content);
-        results.forEach((result) => {
-            const isDuplicate = tabData.results.some(
+        results.forEach((result, index) => {
+            const isDuplicate = [...tabData.results, ...tabData.ignored].some(
                 (existing) =>
                     existing.match === result.match &&
                     existing.source === source
@@ -133,12 +183,17 @@ async function scanForSecrets(
             if (!isDuplicate) {
                 const secretResult = {
                     source: source,
+                    site: site,
                     timestamp: new Date().toISOString(),
                     ...result,
                 };
 
                 if (filterWithReason(secretResult) === null) {
-                    tabData.results.push(secretResult);
+                    if (isIgnored[index]) {
+                        tabData.ignored.push(secretResult);
+                    } else {
+                        tabData.results.push(secretResult);
+                    }
                 }
             }
         });

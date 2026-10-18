@@ -149,3 +149,41 @@ a {
 .invisible {
     display: none;
 }
+
+.link-button {
+    padding: 0;
+    margin-top: 6px;
+    background: none;
+    color: #6b7280;
+    font-size: 12px;
+    text-decoration: underline;
+
+    &:hover,
+    &:active {
+        background: none;
+        color: #374151;
+    }
+    &:disabled {
+        background: none;
+        color: #9ca3af;
+    }
+}
+
+.ignored-section {
+    margin-bottom: 8px;
+
+    summary {
+        cursor: pointer;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .result-item {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+    }
+
+    .result-type {
+        color: #6b7280;
+    }
+}

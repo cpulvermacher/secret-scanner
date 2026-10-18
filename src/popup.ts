@@ -1,6 +1,6 @@
 import type { ScriptFetchError, SecretResult, TabData } from "./util/tabdata";
 import { getActiveTabId } from "./util/browser";
-import type { UserActionMessage } from "./util/messages";
+import type { GetStatusMessage, SetIgnoredMessage } from "./util/messages";
 
 const maxMatchLength = 1000;
 const maxErrorLength = 200;
@@ -10,6 +10,9 @@ const maxUrlLength = 200;
 const loading = document.getElementById("loading") as HTMLElement;
 const resultsList = document.getElementById("resultsList") as HTMLElement;
 const errorList = document.getElementById("errorList") as HTMLElement;
+const ignoredSection = document.getElementById("ignoredSection") as HTMLElement;
+const ignoredSummary = document.getElementById("ignoredSummary") as HTMLElement;
+const ignoredList = document.getElementById("ignoredList") as HTMLElement;
 const cautionText = document.getElementById("caution") as HTMLElement;
 
 // Get current tab and initialize UI
@@ -22,12 +25,13 @@ chrome.storage.session.onChanged.addListener((changes) => {
         const tabData = changes[tabKey].newValue as TabData;
 
         displayResults(tabData.results);
+        displayIgnored(tabData.ignored ?? []);
         displayErrors(tabData.errors);
     }
 });
 
 async function checkStatus(tabId: number) {
-    const tab = await chrome.runtime.sendMessage<UserActionMessage, TabData>({
+    const tab = await chrome.runtime.sendMessage<GetStatusMessage, TabData>({
         type: "userAction",
         action: "getStatus",
         tabId,
@@ -35,7 +39,20 @@ async function checkStatus(tabId: number) {
 
     loading.className = "invisible";
     displayResults(tab.results);
+    displayIgnored(tab.ignored ?? []);
     displayErrors(tab.errors);
+}
+
+async function setIgnored(result: SecretResult, ignored: boolean) {
+    await chrome.runtime.sendMessage<SetIgnoredMessage>({
+        type: "userAction",
+        action: "setIgnored",
+        tabId: currentTabId,
+        site: result.site,
+        match: result.match,
+        ignored,
+    });
+    // UI is updated via storage.session.onChanged
 }
 
 function displayResults(results: SecretResult[]): void {
@@ -54,58 +71,88 @@ function displayResults(results: SecretResult[]): void {
     }
 
     for (const result of results) {
-        const resultItem = document.createElement("div");
-        resultItem.className = "result-item";
-
-        const typeDiv = document.createElement("div");
-        typeDiv.className = "result-type";
-
-        const typeText = document.createElement("span");
-        typeText.textContent = result.type;
-        typeDiv.appendChild(typeText);
-
-        const severityBadge = document.createElement("span");
-        severityBadge.className = `severity-badge severity-${result.severity}`;
-        severityBadge.textContent = result.severity.toUpperCase();
-        typeDiv.appendChild(severityBadge);
-
-        resultItem.appendChild(typeDiv);
-
-        const matchDiv = document.createElement("div");
-        matchDiv.className = "result-match";
-        matchDiv.textContent = truncateString(result.match, maxMatchLength);
-        resultItem.appendChild(matchDiv);
-
-        const sourceDiv = document.createElement("div");
-        sourceDiv.className = "result-source";
-        sourceDiv.textContent = "Source: ";
-
-        if (isValidUrl(result.source)) {
-            const link = document.createElement("a");
-            link.className = "source-link";
-            link.href = encodeURI(result.source);
-            link.textContent = truncateString(result.source, maxUrlLength);
-            link.addEventListener("click", (e) => {
-                e.preventDefault();
-                const url = (e.target as HTMLAnchorElement).href;
-                if (url && isValidUrl(url)) {
-                    chrome.tabs.create({ url: `view-source:${url}` });
-                }
-            });
-            sourceDiv.appendChild(link);
-        } else {
-            sourceDiv.appendChild(
-                document.createTextNode(
-                    truncateString(result.source, maxUrlLength)
-                )
-            );
-        }
-
-        resultItem.appendChild(sourceDiv);
-        resultsList.appendChild(resultItem);
+        resultsList.appendChild(createResultItem(result, false));
     }
 
     cautionText.className = "";
+}
+
+function displayIgnored(ignored: SecretResult[]): void {
+    ignoredList.replaceChildren();
+    ignoredSection.className =
+        ignored.length > 0 ? "ignored-section" : "ignored-section invisible";
+    ignoredSummary.textContent = `Ignored as known public (${ignored.length})`;
+
+    for (const result of ignored) {
+        ignoredList.appendChild(createResultItem(result, true));
+    }
+}
+
+function createResultItem(
+    result: SecretResult,
+    isIgnored: boolean
+): HTMLElement {
+    const resultItem = document.createElement("div");
+    resultItem.className = "result-item";
+
+    const typeDiv = document.createElement("div");
+    typeDiv.className = "result-type";
+
+    const typeText = document.createElement("span");
+    typeText.textContent = result.type;
+    typeDiv.appendChild(typeText);
+
+    const severityBadge = document.createElement("span");
+    severityBadge.className = `severity-badge severity-${result.severity}`;
+    severityBadge.textContent = result.severity.toUpperCase();
+    typeDiv.appendChild(severityBadge);
+
+    resultItem.appendChild(typeDiv);
+
+    const matchDiv = document.createElement("div");
+    matchDiv.className = "result-match";
+    matchDiv.textContent = truncateString(result.match, maxMatchLength);
+    resultItem.appendChild(matchDiv);
+
+    const sourceDiv = document.createElement("div");
+    sourceDiv.className = "result-source";
+    sourceDiv.textContent = "Source: ";
+
+    if (isValidUrl(result.source)) {
+        const link = document.createElement("a");
+        link.className = "source-link";
+        link.href = encodeURI(result.source);
+        link.textContent = truncateString(result.source, maxUrlLength);
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const url = (e.target as HTMLAnchorElement).href;
+            if (url && isValidUrl(url)) {
+                chrome.tabs.create({ url: `view-source:${url}` });
+            }
+        });
+        sourceDiv.appendChild(link);
+    } else {
+        sourceDiv.appendChild(
+            document.createTextNode(truncateString(result.source, maxUrlLength))
+        );
+    }
+
+    resultItem.appendChild(sourceDiv);
+
+    if (result.site) {
+        const ignoreButton = document.createElement("button");
+        ignoreButton.className = "link-button";
+        ignoreButton.textContent = isIgnored
+            ? "Stop ignoring"
+            : `Known public, ignore on ${result.site}`;
+        ignoreButton.addEventListener("click", () => {
+            ignoreButton.disabled = true;
+            void setIgnored(result, !isIgnored);
+        });
+        resultItem.appendChild(ignoreButton);
+    }
+
+    return resultItem;
 }
 
 function displayErrors(errors: ScriptFetchError[]) {

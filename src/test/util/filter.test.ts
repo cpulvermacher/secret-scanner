@@ -9,6 +9,7 @@ function makeSecret(source: string): SecretResult {
 		match: "api_key: 'secret'",
 		severity: "medium",
 		source,
+		site: "example.com",
 		timestamp: "2026-01-01T00:00:00.000Z",
 	};
 }

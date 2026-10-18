@@ -12,6 +12,8 @@ A browser extension that scans JavaScript files loaded by websites for embedded 
 
 Pages are automatically scanned in the background, and the number of found secrets is shown in the extension icon in the toolbar. Click the extension icon to see details.
 
+If a secret is meant to be public (e.g. a restricted Google Maps API key), click `Known public, ignore on ...` to hide it on that site from now on. Ignored secrets are listed in a collapsed section in the popup, where they can be restored with `Stop ignoring`. Only a hash of each ignored secret is stored.
+
 ## Limitations
 
 - Used bandwidth may increase. Consider only enabling the extension when needed on metered mobile connections.

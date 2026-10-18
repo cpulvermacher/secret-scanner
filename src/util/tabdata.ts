@@ -2,6 +2,7 @@ import type { Secret } from "../secrets/scan";
 
 export type TabData = {
     results: SecretResult[];
+    ignored: SecretResult[]; // results the user marked as "known public, ignore"
     errors: ScriptFetchError[];
 };
 
@@ -12,6 +13,7 @@ export type ScriptFetchError = {
 
 export type SecretResult = Secret & {
     source: string; // source URL
+    site: string; // site of the page the secret was found on, see getSite()
     timestamp: string;
 };
 
@@ -25,7 +27,11 @@ function getTabKey(tabId: number) {
 export async function getTabData(tabId: number): Promise<TabData | undefined> {
     const key = getTabKey(tabId);
     const result = await chrome.storage.session.get(key);
-    return result[key] as TabData | undefined;
+    const tabData = result[key] as TabData | undefined;
+    if (tabData) {
+        tabData.ignored ??= []; // missing in data stored by older versions
+    }
+    return tabData;
 }
 
 export async function deleteTabData(tabId: number): Promise<void> {
@@ -48,6 +54,7 @@ export async function updateTabData(
         if (!tabData) {
             tabData = {
                 results: [],
+                ignored: [],
                 errors: [],
             };
         }
