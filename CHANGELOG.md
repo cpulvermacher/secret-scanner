@@ -1,7 +1,8 @@
 # Change Log
 
 ## [0.8.0]
-- Allow ignoring false positives / known issues per site. Ignored secrets can be restored from the popup.
+- Allow ignoring false positives / known issues per site. Ignored results are hashed and stored only locally.
+- Minor UI improvements.
 
 ## [0.7.2]
 - Update icon.
