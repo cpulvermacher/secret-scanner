@@ -1,10 +1,10 @@
-import type { ScriptFetchError, SecretResult, TabData } from "./util/tabdata";
 import { getActiveTabId } from "./util/browser";
 import type { GetStatusMessage, SetIgnoredMessage } from "./util/messages";
+import type { ScriptFetchError, SecretResult, TabData } from "./util/tabdata";
 
 const maxMatchLength = 1000;
 const maxErrorLength = 200;
-const maxUrlLength = 200;
+const maxUrlLength = 120;
 
 // UI elements
 const loading = document.getElementById("loading") as HTMLElement;
@@ -62,8 +62,7 @@ function displayResults(results: SecretResult[]): void {
     if (results.length === 0) {
         const noResults = document.createElement("div");
         noResults.className = "no-results";
-        noResults.textContent =
-            "No secrets found. Any secrets detected will be listed here.";
+        noResults.textContent = "No secrets found on this page.";
         resultsList.appendChild(noResults);
         cautionText.className = "invisible";
 
@@ -79,8 +78,7 @@ function displayResults(results: SecretResult[]): void {
 
 function displayIgnored(ignored: SecretResult[]): void {
     ignoredList.replaceChildren();
-    ignoredSection.className =
-        ignored.length > 0 ? "ignored-section" : "ignored-section invisible";
+    ignoredSection.classList.toggle("invisible", ignored.length === 0);
     ignoredSummary.textContent = `Ignored (${ignored.length})`;
 
     for (const result of ignored) {
@@ -93,7 +91,7 @@ function createResultItem(
     isIgnored: boolean
 ): HTMLElement {
     const resultItem = document.createElement("div");
-    resultItem.className = "result-item";
+    resultItem.className = `result-item result-item--${result.severity}`;
 
     const typeDiv = document.createElement("div");
     typeDiv.className = "result-type";
@@ -104,7 +102,7 @@ function createResultItem(
 
     const severityBadge = document.createElement("span");
     severityBadge.className = `severity-badge severity-${result.severity}`;
-    severityBadge.textContent = result.severity.toUpperCase();
+    severityBadge.textContent = result.severity;
     typeDiv.appendChild(severityBadge);
 
     resultItem.appendChild(typeDiv);
@@ -116,7 +114,6 @@ function createResultItem(
 
     const sourceDiv = document.createElement("div");
     sourceDiv.className = "result-source";
-    sourceDiv.textContent = "Source: ";
 
     if (isValidUrl(result.source)) {
         const link = document.createElement("a");
