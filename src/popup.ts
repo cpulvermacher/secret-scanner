@@ -1,3 +1,4 @@
+import type { Severity } from "./secrets/patterns";
 import { getActiveTabId } from "./util/browser";
 import type { GetStatusMessage, SetIgnoredMessage } from "./util/messages";
 import type { ScriptFetchError, SecretResult, TabData } from "./util/tabdata";
@@ -69,11 +70,20 @@ function displayResults(results: SecretResult[]): void {
         return;
     }
 
-    for (const result of results) {
+    for (const result of sortBySeverity(results)) {
         resultsList.appendChild(createResultItem(result, false));
     }
 
     cautionText.className = "";
+}
+
+const severityRank: Record<Severity, number> = { high: 0, medium: 1 };
+
+// Stable sort, so results of equal severity keep their discovery order
+function sortBySeverity(results: SecretResult[]): SecretResult[] {
+    return results.toSorted(
+        (a, b) => severityRank[a.severity] - severityRank[b.severity]
+    );
 }
 
 function displayIgnored(ignored: SecretResult[]): void {
@@ -81,7 +91,7 @@ function displayIgnored(ignored: SecretResult[]): void {
     ignoredSection.classList.toggle("invisible", ignored.length === 0);
     ignoredSummary.textContent = `Ignored (${ignored.length})`;
 
-    for (const result of ignored) {
+    for (const result of sortBySeverity(ignored)) {
         ignoredList.appendChild(createResultItem(result, true));
     }
 }
