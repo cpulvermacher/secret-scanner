@@ -14,7 +14,7 @@
     </head>
     <body>
         <h1>Test Page for Secret Detection</h1>
-        <p>Expected number of secrets: 11</p>
+        <p>Expected number of secrets: 12</p>
 
         <script>
             // Inline script with a fake private key
@@ -42,5 +42,10 @@ vWN4r1ZQRhVfhUB8eOKaOsAT1oWIJzNzNqmyFU9gTJMwNdOdC3F+5MRbVzw8cQmG
                 'const dynamicKey = "AIza11111111111111111111111111111111111";';
             document.body.appendChild(dynamicScript);
         </script>
+
+        <!-- about:srcdoc frame: "Ignore on" should show this page's host, not "about:" -->
+        <iframe
+            srcdoc="<script>const srcdocToken = 'ghp_srcdoc0123456789abcdefghijklmnopqrst';</script>"
+        ></iframe>
     </body>
 </html>
