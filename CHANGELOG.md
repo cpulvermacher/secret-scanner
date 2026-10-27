@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.8.1]
+- Fix: `about:` URLs might be shown as source.
+
 ## [0.8.0]
 - Allow ignoring false positives / known issues per site. Ignored results are hashed and stored only locally.
 - Minor UI improvements.
